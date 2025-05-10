@@ -85,8 +85,8 @@ const fixedMenuItems = [
   },
   {
     key: '/add_picture',
-    label: '创建图片',
-    title: '创建图片',
+    label: '发布图片',
+    title: '发布图片',
   },
 ]
 

@@ -1,9 +1,9 @@
 <template>
   <div id="basicLayout">
     <a-layout style="min-height: 100vh">
-      <div class="content-container" :class="{ 'overlay-mode': isHomePage }">
+      <div class="content-container" :class="{ 'overlay-mode': shouldUseOverlay }">
         <!-- 头部根据路由决定是否覆盖 -->
-        <a-layout-header class="header" :class="{ 'overlay-header': isHomePage }">
+        <a-layout-header class="header" :class="{ 'overlay-header': shouldUseOverlay }">
           <GlobalHeader />
         </a-layout-header>
 
@@ -28,9 +28,13 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-// 判断当前路由是否为 HomePage
-const isHomePage = computed(() => {
-  return route.name === 'home' || route.path === '/';
+// 判断当前路由是否需要覆盖模式
+const shouldUseOverlay = computed(() => {
+  // 使用精确的路径和名称来判断
+  const overlayPaths = ['/', '/user/login', '/user/register'];
+  const overlayNames = ['home', '用户登录', '用户注册'];
+
+  return overlayPaths.includes(route.path) || overlayNames.includes(route.name as string);
 });
 </script>
 
@@ -97,7 +101,7 @@ const isHomePage = computed(() => {
   flex-direction: column;
 }
 
-/* 只有在HomePage模式下才使用相对定位 */
+/* 只有在需要覆盖模式下才使用相对定位 */
 .overlay-mode {
   position: relative;
 }

@@ -7,7 +7,11 @@
       <a-form :model="formState" name="basic" autocomplete="off" @finish="handleSubmit" class="login-form">
         <a-form-item name="userAccount" :rules="[{ required: true, message: '请输入账号' }]">
           <label>账号</label>
-          <a-input v-model:value="formState.userAccount" placeholder="请输入账号" />
+          <a-input
+            v-model:value="formState.userAccount"
+            placeholder="请输入账号"
+            class="custom-input"
+          />
         </a-form-item>
 
         <a-form-item
@@ -18,7 +22,11 @@
           ]"
         >
           <label>密码</label>
-          <a-input-password v-model:value="formState.userPassword" placeholder="请输入密码" />
+          <a-input-password
+            v-model:value="formState.userPassword"
+            placeholder="请输入密码"
+            class="custom-input"
+          />
         </a-form-item>
 
         <a-form-item>
@@ -50,8 +58,10 @@ const formState = reactive<API.UserLoginRequest>({
 const loginUserStore = useLoginUserStore()
 
 /**
- * 提交表单
- * @param values
+ • 提交表单
+
+ • @param values
+
  */
 const handleSubmit = async (values: any) => {
   const res = await userLoginUsingPost(values)
@@ -111,8 +121,6 @@ const handleSubmit = async (values: any) => {
   z-index: 2; /* 确保卡片显示在覆盖层之上 */
 }
 
-
-
 h1 {
   font-size: 1.8rem;
   font-weight: 600;
@@ -136,32 +144,65 @@ h1 {
 }
 
 .login-form :deep(label) {
-  font-size: .99em;
+  font-size: 0.95rem;
   color: #444;
   margin-top: 7px;
-  margin-bottom: 3px;
+  margin-bottom: 6px;
   font-weight: 500;
   display: block;
 }
 
-.login-form :deep(.ant-input),
-.login-form :deep(.ant-input-password) {
-  background: #f5f5f6;
-  border: 1px solid #dcdce1;
-  border-radius: 6px;
-  padding: 11px 13px;
-  font-size: .98em;
-  margin-bottom: 2px;
-  outline: none;
-  transition: border 0.18s;
+/* 优化输入框样式 */
+.login-form :deep(.custom-input),
+.login-form :deep(.custom-input .ant-input),
+.login-form :deep(.custom-input .ant-input-password) {
+  background: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   height: auto;
 }
 
-.login-form :deep(.ant-input:focus),
-.login-form :deep(.ant-input-password:focus) {
-  border: 1.5px solid #05a081;
+.login-form :deep(.custom-input:hover) {
+  border-color: #cbd5e1;
+}
+
+.login-form :deep(.custom-input .ant-input:focus),
+.login-form :deep(.custom-input .ant-input-affix-wrapper:focus),
+.login-form :deep(.custom-input .ant-input-affix-wrapper-focused) {
+  border-color: #05a081;
   background: #f0fffa;
+  box-shadow: 0 0 0 2px rgba(5, 160, 129, 0.2);
+  outline: none;
+}
+
+.login-form :deep(.ant-input-affix-wrapper) {
+  padding: 0;
+  background: transparent;
+  border: none;
   box-shadow: none;
+}
+
+.login-form :deep(.ant-input-affix-wrapper:focus),
+.login-form :deep(.ant-input-affix-wrapper-focused) {
+  box-shadow: none;
+}
+
+.login-form :deep(.ant-input-password) {
+  height: auto;
+}
+
+.login-form :deep(.ant-input-suffix) {
+  margin-right: 8px;
+}
+
+.login-form :deep(.ant-form-item-explain-error) {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #e53e3e;
 }
 
 .login-form :deep(.ant-form-item) {
@@ -169,29 +210,37 @@ h1 {
 }
 
 .login-btn {
-  margin-top: 8px;
-  font-size: 1.05em;
+  margin-top: 12px;
+  font-size: 1.05rem;
   font-weight: 600;
-  border-radius: 6px;
-  padding: 11px 0;
+  border-radius: 10px;
+  padding: 12px 0;
   width: 100%;
   background: #05a081;
   color: #fff;
   border: none;
   cursor: pointer;
-  transition: background 0.17s;
-  box-shadow: 0 2px 7px #04a08125;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 10px rgba(5, 160, 129, 0.3);
   height: auto;
+  letter-spacing: 0.5px;
 }
 
 .login-btn:hover {
-  background: #018668;
+  background: #038268;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(5, 160, 129, 0.35);
+}
+
+.login-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(5, 160, 129, 0.3);
 }
 
 .signup-prompt {
-  margin: 17px 0 7px 0;
+  margin: 22px 0 7px 0;
   text-align: center;
-  font-size: 1em;
+  font-size: 1rem;
   color: #545454;
 }
 
@@ -200,16 +249,18 @@ h1 {
   text-decoration: none;
   font-weight: 600;
   margin-left: 7px;
+  transition: color 0.2s ease;
 }
 
 .signup-link:hover {
+  color: #038268;
   text-decoration: underline;
 }
 
 @media (max-width: 500px) {
   .login-card {
-    padding: 18px 4vw 18px 4vw;
-    box-shadow: 0 0 16px #4442;
+    padding: 25px 4vw;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   }
 }
 </style>
