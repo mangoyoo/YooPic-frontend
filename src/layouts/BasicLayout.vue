@@ -86,13 +86,33 @@ const shouldUseOverlay = computed(() => {
 }
 
 #basicLayout .footer {
-  background: #efefef;
-  padding: 16px;
+  background: #fff !important; /* 改为纯白背景 */
+  opacity: 1 !important; /* 确保完全不透明 */
+  padding: 12px 24px; /* 减小内边距 */
+  height: 20px; /* 固定高度 */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05); /* 添加顶部阴影 */
+  border-top: 1px solid #e8e8e8; /* 添加细边框 */
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   text-align: center;
+  z-index: 999; /* 确保在最顶层 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 文字样式优化 */
+#basicLayout .footer a {
+  font-size: 14px;
+  color: #666;
+  transition: color 0.3s;
+}
+
+#basicLayout .footer a:hover {
+  color: #8ab4f8;
+  text-decoration: none;
 }
 
 /* 默认内容容器没有特殊定位 */
