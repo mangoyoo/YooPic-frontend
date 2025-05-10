@@ -251,71 +251,84 @@ const columns = [
     title: 'ID',
     dataIndex: 'id',
     width: 60,
-    fixed: 'left'
+    fixed: 'left',
+    align: 'center',
   },
   {
     title: '图片',
     dataIndex: 'url',
     width: 120,
+    align: 'center',
   },
   {
     title: '名称',
     dataIndex: 'name',
     width: 140,
     ellipsis: true,
+    align: 'center',
   },
   {
     title: '简介',
     dataIndex: 'introduction',
     width: 180,
     ellipsis: true,
+    align: 'center',
   },
   {
     title: '类型',
     dataIndex: 'category',
     width: 100,
     ellipsis: true,
+    align: 'center',
   },
   {
     title: '标签',
     dataIndex: 'tags',
     width: 150,
+    align: 'center',
   },
   {
     title: '图片信息',
     dataIndex: 'picInfo',
     width: 140,
+    align: 'center',
   },
   {
     title: '用户',
     dataIndex: 'userId',
     width: 70,
+    align: 'center',
   },
   {
     title: '空间',
     dataIndex: 'spaceId',
     width: 70,
+    align: 'center',
   },
   {
     title: '审核信息',
     dataIndex: 'reviewMessage',
     width: 200,
+    align: 'center',
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
     width: 150,
+    align: 'center',
   },
   {
     title: '编辑时间',
     dataIndex: 'editTime',
     width: 150,
+    align: 'center',
   },
   {
     title: '操作',
     key: 'action',
     width: 140,
     fixed: 'right',
+    align: 'center',
   },
 ]
 
@@ -551,6 +564,7 @@ const getReviewStatusColor = (status: number) => {
 .search-form {
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
   gap: 8px;
   align-items: flex-start;
 }
@@ -584,10 +598,12 @@ const getReviewStatusColor = (status: number) => {
   color: #333333;
   font-weight: 600;
   padding: 10px 8px;
+  text-align: center;
 }
 
 .picture-table :deep(.ant-table-tbody > tr > td) {
   padding: 8px;
+  text-align: center;
 }
 
 .picture-table :deep(.ant-table-tbody > tr:hover > td) {
@@ -613,6 +629,7 @@ const getReviewStatusColor = (status: number) => {
   align-items: center;
   justify-content: center;
   background-color: #f0f2f5;
+  margin: 0 auto;
 }
 
 .image-preview :deep(img) {
@@ -635,6 +652,7 @@ const getReviewStatusColor = (status: number) => {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  margin: 0 auto;
 }
 
 /* 紧凑信息布局 */
@@ -642,22 +660,27 @@ const getReviewStatusColor = (status: number) => {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  align-items: center;
 }
 
 .pic-info-item {
   font-size: 12px;
   line-height: 1.4;
   color: #666666;
+  text-align: center;
 }
 
 .review-info-status {
   margin-bottom: 3px;
+  display: flex;
+  justify-content: center;
 }
 
 .review-info-item {
   font-size: 12px;
   line-height: 1.4;
   color: #666666;
+  text-align: center;
 }
 
 .small-text {
@@ -670,6 +693,7 @@ const getReviewStatusColor = (status: number) => {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  justify-content: center;
 }
 
 .action-icon-btn {
@@ -758,11 +782,11 @@ const getReviewStatusColor = (status: number) => {
     padding: 6px 4px;
   }
 }
- .search-form {
-   display: flex;
-   flex-wrap: wrap;
-   width: 100%;
- }
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
 
 .right-actions {
   margin-left: auto; /* 这会将此元素推到右侧 */
@@ -773,5 +797,3 @@ const getReviewStatusColor = (status: number) => {
   gap: 8px;
 }
 </style>
-
-

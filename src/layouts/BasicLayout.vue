@@ -3,8 +3,8 @@
     <a-layout style="min-height: 100vh">
       <div class="content-container" :class="{ 'overlay-mode': shouldUseOverlay }">
         <!-- 头部根据路由决定是否覆盖 -->
-        <a-layout-header class="header" :class="{ 'overlay-header': shouldUseOverlay }">
-          <GlobalHeader />
+        <a-layout-header class="header" :class="{ 'overlay-header': shouldUseOverlay, 'normal-header': !shouldUseOverlay }">
+          <GlobalHeader :class="{ 'overlay-global-header': shouldUseOverlay, 'normal-global-header': !shouldUseOverlay }" />
         </a-layout-header>
 
         <a-layout>
@@ -41,15 +41,100 @@ const shouldUseOverlay = computed(() => {
 <style scoped>
 #basicLayout .header {
   padding-inline: 20px;
-  background: #fff !important; /* 默认有背景色 */
-  color: unset;
   margin-bottom: 1px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; /* 默认有阴影 */
+}
+
+#basicLayout .normal-header {
+  background: #E1EFFE !important; /* 亮蓝色背景 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+/* GlobalHeader 样式 */
+:deep(.normal-global-header) {
+  /* 非覆盖模式下的GlobalHeader样式 */
+  background-color: #D0E8FF; /* 蓝色背景 */
+  border-radius: 6px;
+  padding: 0 15px;
+  margin: 8px 0;
+}
+
+:deep(.overlay-global-header) {
+  /* 覆盖模式下的GlobalHeader样式 - 完全透明 */
+  background-color: transparent; /* 完全透明背景 */
+  backdrop-filter: none; /* 移除模糊效果 */
+  border-radius: 6px;
+  padding: 0 15px;
+  margin: 8px 0;
+}
+
+/* 为非覆盖模式下的文本添加样式 */
+:deep(.normal-global-header a),
+:deep(.normal-global-header .ant-typography),
+:deep(.normal-global-header .ant-menu-title-content),
+:deep(.normal-global-header span) {
+  color: #003366; /* 深蓝色文本 */
+  font-weight: 600; /* 粗体 */
+  font-size: 15px; /* 稍大的字体 */
+}
+
+:deep(.normal-global-header a:hover),
+:deep(.normal-global-header .ant-menu-item-active),
+:deep(.normal-global-header .ant-menu-item-selected) {
+  color: #0055AA !important; /* 鲜明的蓝色 */
+}
+
+/* 为覆盖模式下的文本添加样式 */
+:deep(.overlay-global-header a),
+:deep(.overlay-global-header .ant-typography),
+:deep(.overlay-global-header .ant-menu-title-content),
+:deep(.overlay-global-header span) {
+  color: #FFFFFF; /* 纯白色文本 */
+  font-weight: 600;
+  font-size: 15px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* 文字阴影增强可读性 */
+}
+
+:deep(.overlay-global-header a:hover),
+:deep(.overlay-global-header .ant-menu-item-active),
+:deep(.overlay-global-header .ant-menu-item-selected) {
+  color: #FFD700 !important; /* 金色高亮 */
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); /* 金色光晕效果 */
+}
+
+/* 为菜单项添加特殊样式 */
+:deep(.normal-global-header .ant-menu-item) {
+  margin: 0 5px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+:deep(.normal-global-header .ant-menu-item:hover),
+:deep(.normal-global-header .ant-menu-item-selected) {
+  background-color: #B0D8FF; /* 悬停背景色 */
+}
+
+:deep(.overlay-global-header .ant-menu-item) {
+  margin: 0 5px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+:deep(.overlay-global-header .ant-menu-item:hover),
+:deep(.overlay-global-header .ant-menu-item-selected) {
+  background-color: rgba(255, 255, 255, 0.15); /* 轻微半透明白色背景 */
+}
+
+/* 确保覆盖模式下菜单相关元素完全透明 */
+:deep(.overlay-global-header .ant-menu) {
+  background: transparent !important;
+}
+
+:deep(.overlay-global-header .ant-menu-submenu) {
+  background: transparent !important;
 }
 
 #basicLayout .sider {
   background: #fff;
-  border-right: 0.5px solid #eee;
   padding-top: 20px;
 }
 
@@ -91,7 +176,6 @@ const shouldUseOverlay = computed(() => {
   padding: 12px 24px; /* 减小内边距 */
   height: 20px; /* 固定高度 */
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05); /* 添加顶部阴影 */
-  border-top: 1px solid #e8e8e8; /* 添加细边框 */
   position: fixed;
   bottom: 0;
   left: 0;
@@ -131,15 +215,26 @@ const shouldUseOverlay = computed(() => {
   position: absolute;
   width: 100%;
   z-index: 1000;
-  background: transparent !important;
+  background: transparent !important; /* 完全透明 */
   box-shadow: none !important;
 }
 
-/* 覆盖ant-design默认样式 */
-:deep(.ant-layout-header) {
-  /* 移除此处的transparent背景设置，通过类控制 */
+/* 确保覆盖模式下所有菜单和子元素都是透明的 */
+:deep(.overlay-header .ant-menu),
+:deep(.overlay-header .ant-menu-submenu),
+:deep(.overlay-header .ant-menu-item),
+:deep(.overlay-header .ant-menu-item-only-child) {
+  background: transparent !important;
 }
 
+:deep(.overlay-global-header .ant-row),
+:deep(.overlay-global-header .ant-col),
+:deep(.overlay-global-header .ant-menu-overflow),
+:deep(.overlay-global-header .ant-menu-overflow-item) {
+  background: transparent !important;
+}
+
+/* 覆盖ant-design默认样式 */
 :deep(.ant-layout) {
   background: transparent !important;
 }
@@ -148,3 +243,4 @@ const shouldUseOverlay = computed(() => {
   background: transparent !important;
 }
 </style>
+
