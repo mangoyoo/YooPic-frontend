@@ -57,7 +57,19 @@
 
 <script lang="ts" setup>
 import { computed, h, ref, watchEffect } from 'vue'
-import { HomeOutlined, LogoutOutlined, UserOutlined, TeamOutlined, PictureOutlined, CaretDownOutlined } from '@ant-design/icons-vue'
+import {
+  HomeOutlined,
+  LogoutOutlined,
+  UserOutlined,
+  TeamOutlined,
+  PictureOutlined,
+  CaretDownOutlined,
+  CloudOutlined,
+  UploadOutlined,
+  AppstoreOutlined,
+  SettingOutlined,
+  FileImageOutlined
+} from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
@@ -71,41 +83,45 @@ const router = useRouter()
 // 团队空间列表
 const teamSpaceList = ref<API.SpaceUserVO[]>([])
 
-// 基础菜单项
+// 基础菜单项 - 交换了云空间和发布图片的位置
 const fixedMenuItems = [
   {
     key: '/',
-    icon: () => h(PictureOutlined),
+    icon: () => h(HomeOutlined),
     label: '主页',
-  },
-  {
-    key: '/my_space',
-    label: '个人空间',
-    icon: () => h(UserOutlined),
   },
   {
     key: '/add_picture',
     label: '发布图片',
     title: '发布图片',
+    icon: () => h(UploadOutlined),
+  },
+  {
+    key: '/my_space',
+    label: '云空间',
+    icon: () => h(CloudOutlined),
   },
 ]
 
-// 管理员菜单项
+// 管理员菜单项 - 添加了图标
 const adminItems = [
   {
     key: '/admin/userManage',
     label: '用户管理',
     title: '用户管理',
+    icon: () => h(UserOutlined),
   },
   {
     key: '/admin/pictureManage',
     label: '图片管理',
     title: '图片管理',
+    icon: () => h(FileImageOutlined),
   },
   {
     key: '/admin/spaceManage',
     label: '空间管理',
     title: '空间管理',
+    icon: () => h(AppstoreOutlined),
   },
 ]
 
@@ -113,16 +129,17 @@ const adminItems = [
 const getTeamSpaceMenu = computed(() => ({
   key: 'team',
   label: '团队空间',
-  icon: () => h(CaretDownOutlined),
+  icon: () => h(TeamOutlined),
   children: [
     {
       key: '/add_space?type=' + SPACE_TYPE_ENUM.TEAM,
       label: '创建团队',
-      icon: () => h(TeamOutlined),
+      icon: () => h(PictureOutlined),
     },
     ...teamSpaceList.value.map(spaceUser => ({
       key: '/space/' + spaceUser.spaceId,
       label: spaceUser.space?.spaceName,
+      icon: () => h(TeamOutlined),
     }))
   ]
 }))
@@ -231,31 +248,107 @@ const doLogout = async () => {
 :deep(.ant-menu-item) {
   background: transparent !important;
   color: white !important;
+  padding: 0 16px;
+  margin: 0 4px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  border-bottom: none !important;
 }
 
 :deep(.ant-menu-submenu) {
   background: transparent !important;
   color: white !important;
+  margin: 0 4px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  border-bottom: none !important;
 }
 
+/* 移除选中样式，统一使用普通状态 */
 :deep(.ant-menu-item-selected) {
+  color: white !important;
+  background: transparent !important;
+  border-bottom: none !important;
+  font-weight: normal !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transform: none;
+  box-shadow: none;
+}
+
+/* 移除菜单项的默认下划线 */
+:deep(.ant-menu-horizontal::after) {
+  display: none !important;
+}
+
+:deep(.ant-menu-item-selected)::after,
+:deep(.ant-menu-item::after) {
+  display: none !important;
+  border-bottom: none !important;
+}
+
+:deep(.ant-menu-submenu::after) {
+  display: none !important;
+  border-bottom: none !important;
+}
+
+/* 只保留悬停效果 */
+:deep(.ant-menu-item:hover) {
   color: #fff !important;
-  font-weight: bold !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 6px;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+  border-bottom: none !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+:deep(.ant-menu-submenu:hover) {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 6px;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+  border-bottom: none !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
 :deep(.ant-menu-title-content) {
   color: white !important;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+/* 移除选中项的特殊文本效果 */
+:deep(.ant-menu-item-selected .ant-menu-title-content) {
+  letter-spacing: normal;
+  transform: none;
 }
 
 :deep(.ant-menu-submenu-title) {
   color: white !important;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
 }
 
 /* 覆盖下拉菜单项的背景色 */
 :deep(.ant-dropdown-menu) {
   background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+:deep(.ant-dropdown-menu-item) {
+  transition: all 0.2s ease;
+}
+
+:deep(.ant-dropdown-menu-item:hover) {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .user-login-status {
