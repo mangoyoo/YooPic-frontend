@@ -45,17 +45,55 @@ const shouldUseOverlay = computed(() => {
 }
 
 #basicLayout .normal-header {
-  background: #E1EFFE !important; /* 亮蓝色背景 */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  background: #C4DDFC !important; /* 更深的蓝色背景 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 为普通模式的标题添加更明显的点缀图案 */
+#basicLayout .normal-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.4) 2%, transparent 3%),
+    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.4) 2%, transparent 3%);
+  background-size: 120px 120px;
+  opacity: 0.7;
+  z-index: 0;
 }
 
 /* GlobalHeader 样式 */
 :deep(.normal-global-header) {
   /* 非覆盖模式下的GlobalHeader样式 */
-  background-color: #D0E8FF; /* 蓝色背景 */
+  background-color: #B3D4FF; /* 更深的蓝色背景 */
   border-radius: 6px;
   padding: 0 15px;
   margin: 8px 0;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* 为普通全局头部添加更明显的点缀图案 */
+:deep(.normal-global-header::before) {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%,
+    transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%, transparent);
+  background-size: 40px 40px;
+  z-index: -1;
+  opacity: 0.6;
 }
 
 :deep(.overlay-global-header) {
@@ -72,15 +110,17 @@ const shouldUseOverlay = computed(() => {
 :deep(.normal-global-header .ant-typography),
 :deep(.normal-global-header .ant-menu-title-content),
 :deep(.normal-global-header span) {
-  color: #003366; /* 深蓝色文本 */
+  color: #002855; /* 更深的蓝色文本 */
   font-weight: 600; /* 粗体 */
   font-size: 15px; /* 稍大的字体 */
+  position: relative;
+  z-index: 2;
 }
 
 :deep(.normal-global-header a:hover),
 :deep(.normal-global-header .ant-menu-item-active),
 :deep(.normal-global-header .ant-menu-item-selected) {
-  color: #0055AA !important; /* 鲜明的蓝色 */
+  color: #004080 !important; /* 更鲜明的蓝色 */
 }
 
 /* 为覆盖模式下的文本添加样式 */
@@ -110,7 +150,7 @@ const shouldUseOverlay = computed(() => {
 
 :deep(.normal-global-header .ant-menu-item:hover),
 :deep(.normal-global-header .ant-menu-item-selected) {
-  background-color: #B0D8FF; /* 悬停背景色 */
+  background-color: #9ACDFF; /* 悬停背景色 - 更深一点 */
 }
 
 :deep(.overlay-global-header .ant-menu-item) {
@@ -131,6 +171,33 @@ const shouldUseOverlay = computed(() => {
 
 :deep(.overlay-global-header .ant-menu-submenu) {
   background: transparent !important;
+}
+
+/* 添加整体内容区域的更明显点缀图案 */
+#basicLayout {
+  position: relative;
+}
+
+#basicLayout::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(173, 216, 230, 0.15) 2%, transparent 3%),
+    radial-gradient(circle at 90% 90%, rgba(173, 216, 230, 0.15) 2%, transparent 3%),
+    radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.1) 1%, transparent 2%);
+  background-size: 180px 180px;
+  opacity: 0.7;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 覆盖模式下隐藏背景图案 */
+.overlay-mode + * ~ #basicLayout::after {
+  opacity: 0;
 }
 
 #basicLayout .sider {
@@ -243,4 +310,3 @@ const shouldUseOverlay = computed(() => {
   background: transparent !important;
 }
 </style>
-
