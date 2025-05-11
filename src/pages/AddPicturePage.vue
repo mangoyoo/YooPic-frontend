@@ -293,11 +293,12 @@ watchEffect(() => {
 <style scoped>
 #addPicturePage {
   width: 100%;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px); /* 减去header高度 */
   padding: 24px;
   background: linear-gradient(140deg, #f5f7fa 0%, #e4e8ef 100%);
+  color: #333;
   position: absolute;
-  top: 64px;
+  top: 64px; /* 从header底部开始 */
   left: 0;
   right: 0;
   bottom: 0;
@@ -314,47 +315,73 @@ watchEffect(() => {
 .upload-card,
 .edit-card,
 .form-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  width: 100%;
   margin-bottom: 24px;
   transition: all 0.3s ease;
 }
 
-.header-card:hover,
+.header-card {
+  padding: 0; /* 移除内边距 */
+}
+
+/* 确保section-header占满ant-card-body */
+:deep(.header-card .ant-card-body) {
+  padding: 0;
+  height: 100%;
+}
+
 .upload-card:hover,
 .edit-card:hover,
 .form-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* ===== 头部标题样式 ===== */
-.header-card {
-  padding: 24px;
-}
-
 .section-header {
+  padding: 24px 32px;
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(114, 46, 209, 0.12) 100%);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
   display: flex;
   align-items: center;
-  padding: 16px 0;
+}
+
+.section-header::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(114, 46, 209, 0.08);
+  z-index: 1;
 }
 
 .title-container {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   margin-right: 24px;
 }
 
 .title-container h1 {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 600;
-  background: linear-gradient(90deg, #1890ff, #722ed1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #334155;
   margin: 0;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
 }
 
 .header-decoration {
@@ -362,11 +389,13 @@ watchEffect(() => {
   width: 60px;
   background: linear-gradient(90deg, #1890ff, #722ed1);
   border-radius: 2px;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .space-link {
-  margin: 0;
+  position: relative;
+  z-index: 2;
+  margin: 0 !important;
   color: #666;
   font-size: 14px;
 }
@@ -377,20 +406,23 @@ watchEffect(() => {
 }
 
 .upload-tabs :deep(.ant-tabs-nav) {
-  margin: 0;
+  margin-bottom: 24px;
 }
 
 .upload-tabs :deep(.ant-tabs-tab) {
   padding: 12px 24px;
   font-size: 15px;
+  transition: all 0.3s;
 }
 
 .upload-tabs :deep(.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn) {
   color: #1890ff;
+  font-weight: 500;
 }
 
 .upload-tabs :deep(.ant-tabs-ink-bar) {
   background: linear-gradient(90deg, #1890ff, #722ed1);
+  height: 3px;
 }
 
 /* ===== 编辑工具栏样式 ===== */
@@ -399,25 +431,52 @@ watchEffect(() => {
 }
 
 .edit-bar {
-  margin: 16px 0;
+  margin: 0 0 24px 0;
 }
 
-.edit-button,
+.edit-button {
+  height: 40px;
+  border-radius: 8px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: all 0.3s;
+  border: 1px solid #d9d9d9;
+}
+
+.edit-button:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
 .ai-button {
   height: 40px;
-  border-radius: 6px;
-  padding: 0 24px;
-  transition: all 0.3s;
-}
-
-.ai-button {
-  background: linear-gradient(90deg, #1890ff, #722ed1);
+  border-radius: 8px;
+  padding: 0 20px;
+  font-weight: 500;
+  background: linear-gradient(90deg, #1890ff, #40a9ff);
   border: none;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ai-button:hover {
-  opacity: 0.9;
+  background: linear-gradient(90deg, #40a9ff, #69c0ff);
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.35);
+}
+
+.ai-button:active {
+  background: linear-gradient(90deg, #096dd9, #1890ff);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
 }
 
 /* ===== 表单样式 ===== */
@@ -427,43 +486,115 @@ watchEffect(() => {
 
 .picture-form {
   width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
+/* 调整输入框样式 */
 .form-input,
-.form-textarea,
-.form-select {
-  border-radius: 6px;
-  border: 1px solid #d9d9d9;
+.form-textarea {
+  border-radius: 8px;
   transition: all 0.3s;
+  width: 100%;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  padding: 10px 16px; /* 增加内边距 */
+  border: 1px solid #e6e8f0;
+  background-color: white;
 }
 
+.form-input {
+  height: 46px; /* 增加高度使输入框更美观 */
+}
+
+/* 调整选择框样式 */
+:deep(.form-select) {
+  width: 100%;
+}
+
+:deep(.form-select .ant-select-selector) {
+  border-radius: 8px !important;
+  min-height: 46px !important;
+  padding: 0 16px !important;
+  border: 1px solid #e6e8f0 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  background-color: white !important;
+}
+
+:deep(.form-select .ant-select-selection-search) {
+  height: 44px !important;
+  display: flex;
+  align-items: center;
+}
+
+:deep(.form-select .ant-select-selection-item) {
+  font-size: 15px;
+}
+
+:deep(.form-select .ant-select-selection-placeholder) {
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* 调整悬停和聚焦状态 */
 .form-input:hover,
-.form-textarea:hover,
-.form-select:hover {
+.form-textarea:hover {
   border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
 }
 
 .form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
+.form-textarea:focus {
   border-color: #1890ff;
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
+:deep(.form-select:hover .ant-select-selector) {
+  border-color: #1890ff !important;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15) !important;
+}
+
+:deep(.form-select.ant-select-focused .ant-select-selector) {
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+/* 给表单项添加适当空间 */
+:deep(.ant-form-item) {
+  margin-bottom: 28px; /* 增加表单项之间的间距 */
+}
+
+/* 表单标签样式 */
+:deep(.ant-form-item-label > label) {
+  font-weight: 500;
+  color: #444444;
+  font-size: 15px;
+  margin-bottom: 4px; /* 增加标签与输入框之间的间距 */
+}
+
 .submit-button {
   width: 100%;
-  height: 44px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #1890ff, #722ed1);
-  border: none;
+  border-radius: 8px;
+  height: 46px; /* 与输入框保持一致 */
+  font-weight: 500;
   font-size: 16px;
-  transition: all 0.3s;
+  background: linear-gradient(90deg, #1890ff, #40a9ff); /* 添加渐变效果 */
+  border: none;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+  transition: all 0.3s ease;
+  margin-top: 12px;
 }
 
 .submit-button:hover {
-  opacity: 0.9;
+  background: linear-gradient(90deg, #40a9ff, #69c0ff);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.35);
+}
+
+.submit-button:active {
+  background: linear-gradient(90deg, #096dd9, #1890ff);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
 }
 
 /* 响应式适配 */
@@ -472,20 +603,47 @@ watchEffect(() => {
     padding: 16px;
   }
 
-  .header-card,
-  .upload-card,
-  .edit-card,
-  .form-card {
-    padding: 16px;
+  .content-container {
+    max-width: 100%;
   }
 
   .section-header {
+    padding: 20px;
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .title-container h1 {
-    font-size: 24px;
+  .title-container {
+    margin-bottom: 16px;
+    margin-right: 0;
+  }
+
+  .upload-card,
+  .edit-card,
+  .form-card {
+    padding: 20px;
+  }
+
+  .picture-form {
+    max-width: 100%;
+  }
+
+  .edit-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .edit-bar .ant-space {
+    width: 100%;
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px !important;
+  }
+
+  .edit-button,
+  .ai-button {
+    width: 100%;
   }
 }
 </style>
