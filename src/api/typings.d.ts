@@ -82,7 +82,12 @@ declare namespace API {
     data?: LoginUserVO
     message?: string
   }
-
+  type UserVOUpdateRequest = {
+    id?: number
+    userName?: string
+    userAvatar?: string
+    userProfile?: string
+  }
   type BaseResponseLong_ = {
     code?: number
     data?: number
@@ -649,6 +654,7 @@ declare namespace API {
     spaceId?: number
   }
 
+
   type User = {
     createTime?: string
     editTime?: string
@@ -664,6 +670,11 @@ declare namespace API {
     vipCode?: string
     vipExpireTime?: string
     vipNumber?: number
+  }
+
+  type UserAvatarUpdateRequest = {
+    id?: number
+    userAvatar?: string
   }
 
   type UserAddRequest = {
@@ -720,5 +731,16 @@ declare namespace API {
 
   type VipExchangeRequest = {
     vipCode?: string
+  }
+  type UserPassChangeRequest = {
+
+    userAccount?: string
+
+    userPassword?: string
+
+    newPassword?: string
+  }
+  type UserPictureCountRequest = {
+    userId?: number
   }
 }

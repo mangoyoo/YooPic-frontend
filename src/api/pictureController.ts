@@ -296,3 +296,17 @@ export async function uploadPictureByUrlUsingPost(
     ...(options || {}),
   })
 }
+/** 获取用户图片统计信息 POST /api/picture/statistics */
+export async function getUserPictureStatistics(
+  body: { userId: number },
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseMapStringLong_>('/api/picture/get/statistics', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}

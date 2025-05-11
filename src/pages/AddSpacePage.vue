@@ -3,98 +3,110 @@
     <div class="content-container">
       <!-- 头部标题卡片 -->
       <a-card class="header-card" :bordered="false">
-        <div class="section-header">
-          <span class="section-title">
-            {{ route.query?.id ? '修改' : '创建' }} {{ SPACE_TYPE_MAP[spaceType] }}
-          </span>
-          <a-divider type="vertical" />
+        <div class="page-header">
+          <div class="header-content">
+            <div class="title-container">
+              <h1>
+                <span class="action-text">{{ route.query?.id ? '修改' : '创建' }}</span>
+                <span class="space-type">{{ SPACE_TYPE_MAP[spaceType] }}</span>
+              </h1>
+              <div class="header-decoration"></div>
+            </div>
+            <p>填写空间信息，开始您的云端之旅</p>
+          </div>
         </div>
       </a-card>
 
-      <!-- 空间信息表单 -->
-      <a-card class="form-card" :bordered="false">
-        <a-form
-          name="spaceForm"
-          layout="vertical"
-          :model="spaceForm"
-          @finish="handleSubmit"
-          class="space-form"
-        >
-          <a-form-item name="spaceName" label="空间名称">
-            <a-input
-              v-model:value="spaceForm.spaceName"
-              placeholder="请输入空间名称"
-              allow-clear
-              class="form-input"
-            />
-          </a-form-item>
-
-          <a-form-item name="spaceLevel" label="空间级别">
-            <a-select
-              v-model:value="spaceForm.spaceLevel"
-              placeholder="请选择空间级别"
-              :options="SPACE_LEVEL_OPTIONS"
-              allow-clear
-              class="form-select"
-            />
-          </a-form-item>
-
-          <a-form-item>
-            <a-button
-              type="primary"
-              html-type="submit"
-              :loading="loading"
-              class="submit-button"
+      <a-row :gutter="[24, 24]">
+        <!-- 左侧空间信息表单 -->
+        <a-col :xs="24" :md="14">
+          <a-card class="form-card" :bordered="false">
+            <a-form
+              name="spaceForm"
+              layout="vertical"
+              :model="spaceForm"
+              @finish="handleSubmit"
+              class="space-form"
             >
-              <template #icon><SaveOutlined /></template>
-              {{ route.query?.id ? '保存修改' : '创建空间' }}
-            </a-button>
-          </a-form-item>
-        </a-form>
-      </a-card>
+              <a-form-item name="spaceName" label="空间名称">
+                <a-input
+                  v-model:value="spaceForm.spaceName"
+                  placeholder="请输入空间名称"
+                  allow-clear
+                  class="form-input"
+                />
+              </a-form-item>
 
-      <!-- 空间级别介绍 -->
-      <a-card class="info-card" :bordered="false">
-        <template #title>
-          <div class="card-title">
-            <InfoCircleOutlined />
-            <span>空间级别介绍</span>
-          </div>
-        </template>
+              <a-form-item name="spaceLevel" label="空间级别">
+                <a-select
+                  v-model:value="spaceForm.spaceLevel"
+                  placeholder="请选择空间级别"
+                  :options="SPACE_LEVEL_OPTIONS"
+                  allow-clear
+                  class="form-select"
+                />
+              </a-form-item>
 
-        <div class="info-content">
-          <a-alert
-            type="info"
-            show-icon
-            class="info-alert"
-          >
-            <template #message>
-              目前仅支持开通普通版，如需升级空间，请联系
-              <a href="" target="_blank" class="contact-link">MangoYoo</a>
+              <a-form-item>
+                <a-button
+                  type="primary"
+                  html-type="submit"
+                  :loading="loading"
+                  class="submit-button"
+                >
+                  <template #icon><SaveOutlined /></template>
+                  {{ route.query?.id ? '保存修改' : '创建空间' }}
+                </a-button>
+              </a-form-item>
+            </a-form>
+          </a-card>
+        </a-col>
+
+        <!-- 右侧空间级别介绍 -->
+        <a-col :xs="24" :md="10">
+          <a-card class="info-card" :bordered="false">
+            <template #title>
+              <div class="card-title">
+                <InfoCircleOutlined />
+                <span>空间级别介绍</span>
+              </div>
             </template>
-          </a-alert>
 
-          <div class="level-list">
-            <div
-              v-for="spaceLevel in spaceLevelList"
-              :key="spaceLevel.id"
-              class="level-item"
-            >
-              <div class="level-name">{{ spaceLevel.text }}</div>
-              <div class="level-details">
-                <span class="detail-item">
-                  <HddOutlined />
-                  大小: {{ formatSize(spaceLevel.maxSize) }}
-                </span>
-                <span class="detail-item">
-                  <FileOutlined />
-                  数量: {{ spaceLevel.maxCount }}
-                </span>
+            <div class="info-content">
+              <a-alert
+                type="info"
+                show-icon
+                class="info-alert"
+              >
+                <template #message>
+                  目前仅支持开通普通版，如需升级空间，请联系
+                  <a href="" target="_blank" class="contact-link">MangoYoo</a>
+                </template>
+              </a-alert>
+
+              <div class="level-list">
+                <div
+                  v-for="spaceLevel in spaceLevelList"
+                  :key="spaceLevel.id"
+                  class="level-item"
+                >
+                  <div class="level-name">{{ spaceLevel.text }}</div>
+                  <div class="level-details">
+                    <span class="detail-item">
+                      <HddOutlined />
+                      大小: {{ formatSize(spaceLevel.maxSize) }}
+                    </span>
+                    <span class="detail-item">
+                      <FileOutlined />
+                      数量: {{ spaceLevel.maxCount }}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </a-card>
+          </a-card>
+        </a-col>
+      </a-row>
     </div>
   </div>
 </template>
@@ -236,138 +248,276 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/*
- * 全局颜色定义
- * 主题背景色：#87CEFA (Light Sky Blue)
- * 卡片背景色：#F0F8FF (Alice Blue)
- * 文本主色：#333333
- * 文本副色：#666666
- * 分割线颜色：#E8E8E8
- */
-
 #addSpacePage {
   width: 100%;
-  min-height: 100vh;
-  padding: 20px;
-  background-color: #f7fafd;
-  color: #333333;
-  display: flex;
-  justify-content: center;
+  min-height: calc(100vh - 64px); /* 减去header高度 */
+  padding: 24px;
+  background: linear-gradient(140deg, #f5f7fa 0%, #e4e8ef 100%);
+  color: #333;
+  position: absolute;
+  top: 64px; /* 从header底部开始 */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
 }
 
 .content-container {
-  width: 100%;
-  max-width: 720px; /* 限制内容区域最大宽度 */
-  display: flex;
-  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* ===== 卡片公共样式 ===== */
 .header-card,
 .form-card,
 .info-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  background-color: #F0F8FF;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
   overflow: hidden;
-  margin-bottom: 16px;
   width: 100%;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.header-card {
+  margin-bottom: 24px;
+  padding: 0; /* 移除内边距 */
+}
+
+/* 确保page-header占满ant-card-body */
+:deep(.header-card .ant-card-body) {
+  padding: 0;
+  height: 100%;
+}
+
+.form-card:hover,
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* ===== 头部标题样式 ===== */
-.header-card {
-  padding: 16px;
-}
-
-.section-header {
+.page-header {
+  padding: 24px 32px;
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(114, 46, 209, 0.12) 100%);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
   display: flex;
   align-items: center;
 }
 
-.section-title {
-  font-size: 18px;
-  font-weight: 500;
-  color: #333333;
-  position: relative;
-  padding-left: 10px;
-}
-
-.section-title::before {
+.page-header::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
-  background-color: #87CEFA;
-  border-radius: 1.5px;
+  top: -20px;
+  right: -20px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(114, 46, 209, 0.08);
+  z-index: 1;
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+h1 {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  margin-bottom: 4px;
+}
+
+.action-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1890ff;
+  margin-right: 8px;
+}
+
+.space-type {
+  font-size: 20px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.header-decoration {
+  height: 4px;
+  width: 60px;
+  background: linear-gradient(90deg, #1890ff, #722ed1);
+  border-radius: 2px;
+  margin-top: 4px;
+}
+
+.page-header p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
 }
 
 /* ===== 表单样式 ===== */
 .form-card {
-  padding: 24px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
 }
 
 .space-form {
   width: 100%;
+  max-width: 480px; /* 适当缩短表单宽度 */
+  margin: 0 auto; /* 居中表单 */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.form-input,
-.form-select {
-  border-radius: 4px;
+/* 调整输入框样式 */
+.form-input {
+  border-radius: 8px;
   transition: all 0.3s;
+  width: 100%;
+  height: 46px; /* 增加高度使输入框更美观 */
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  padding: 10px 16px; /* 增加内边距 */
+  border: 1px solid #e6e8f0;
+  background-color: white;
+}
+
+/* 调整选择框样式 */
+:deep(.form-select) {
   width: 100%;
 }
 
-.form-input:hover,
-.form-select:hover {
-  border-color: #87CEFA;
+:deep(.form-select .ant-select-selector) {
+  border-radius: 8px !important;
+  height: 46px !important;
+  padding: 0 16px !important;
+  border: 1px solid #e6e8f0 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  background-color: white !important;
 }
 
-.form-input:focus,
-.form-select:focus {
-  border-color: #87CEFA;
-  box-shadow: 0 0 0 2px rgba(135, 206, 250, 0.2);
+:deep(.form-select .ant-select-selection-search) {
+  height: 44px !important;
+  display: flex;
+  align-items: center;
+}
+
+:deep(.form-select .ant-select-selection-item) {
+  line-height: 44px !important;
+  font-size: 15px;
+}
+
+:deep(.form-select .ant-select-selection-placeholder) {
+  line-height: 44px !important;
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* 调整悬停和聚焦状态 */
+.form-input:hover {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+}
+
+.form-input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+:deep(.form-select:hover .ant-select-selector) {
+  border-color: #1890ff !important;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15) !important;
+}
+
+:deep(.form-select.ant-select-focused .ant-select-selector) {
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+/* 给表单项添加适当空间 */
+:deep(.ant-form-item) {
+  margin-bottom: 28px; /* 增加表单项之间的间距 */
+}
+
+/* 表单标签样式 */
+:deep(.ant-form-item-label > label) {
+  font-weight: 500;
+  color: #444444;
+  font-size: 15px;
+  margin-bottom: 4px; /* 增加标签与输入框之间的间距 */
 }
 
 .submit-button {
   width: 100%;
-  border-radius: 4px;
-  height: 40px;
+  border-radius: 8px;
+  height: 46px; /* 与输入框保持一致 */
   font-weight: 500;
-  background-color: #87CEFA;
-  border-color: #87CEFA;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  font-size: 16px;
+  background: linear-gradient(90deg, #1890ff, #40a9ff); /* 添加渐变效果 */
+  border: none;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+  transition: all 0.3s ease;
+  margin-top: 12px;
 }
 
 .submit-button:hover {
-  background-color: #75bdea;
-  border-color: #75bdea;
+  background: linear-gradient(90deg, #40a9ff, #69c0ff);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.35);
+}
+
+.submit-button:active {
+  background: linear-gradient(90deg, #096dd9, #1890ff);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
 }
 
 /* ===== 空间级别介绍卡片 ===== */
 .info-card {
   padding: 0;
-  flex-grow: 0; /* 不要自动拉伸 */
+  display: flex;
+  flex-direction: column;
 }
 
 .card-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #333333;
+  gap: 6px;
+  color: #334155;
   font-weight: 500;
+  font-size: 15px;
+  padding: 16px 24px 0;
 }
 
 .info-content {
-  padding: 16px;
+  padding: 16px 24px 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .info-alert {
   margin-bottom: 16px;
-  border-radius: 4px;
+  border-radius: 8px;
+  border: 1px solid #91caff;
+  background-color: white;
 }
 
 .contact-link {
@@ -384,49 +534,75 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex-grow: 1;
 }
 
 .level-item {
-  padding: 12px;
-  border-radius: 8px;
-  background-color: rgba(135, 206, 250, 0.05);
-  border: 1px solid rgba(135, 206, 250, 0.2);
+  padding: 16px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(24, 144, 255, 0.15);
   transition: all 0.3s ease;
 }
 
 .level-item:hover {
-  background-color: rgba(135, 206, 250, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 .level-name {
-  font-weight: 500;
-  color: #333333;
-  margin-bottom: 8px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 10px;
   font-size: 15px;
 }
 
 .level-details {
   display: flex;
   gap: 16px;
-  color: #666666;
-  font-size: 14px;
+  color: #647282;
+  font-size: 13px;
 }
 
 .detail-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 /* 响应式适配 */
 @media (max-width: 768px) {
   #addSpacePage {
-    padding: 12px;
+    padding: 16px;
+  }
+
+  .content-container {
+    max-width: 100%;
+  }
+
+  .page-header {
+    padding: 20px;
+  }
+
+  .action-text {
+    font-size: 16px;
+  }
+
+  .space-type {
+    font-size: 18px;
   }
 
   .form-card {
-    padding: 16px;
+    padding: 24px;
+  }
+
+  .space-form {
+    max-width: 100%;
+  }
+
+  .info-card {
+    margin-bottom: 0; /* 移除底部外边距，由栅格系统的gutter控制 */
   }
 
   .level-details {

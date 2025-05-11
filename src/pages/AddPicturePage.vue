@@ -4,9 +4,10 @@
       <!-- 头部标题卡片 -->
       <a-card class="header-card" :bordered="false">
         <div class="section-header">
-          <span class="section-title">
-            {{ route.query?.id ? '修改图片' : '创建图片' }}
-          </span>
+          <div class="title-container">
+            <h1>{{ route.query?.id ? '修改图片' : '创建图片' }}</h1>
+            <div class="header-decoration"></div>
+          </div>
           <a-divider type="vertical" />
           <a-typography-paragraph v-if="spaceId" class="space-link">
             保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
@@ -290,30 +291,22 @@ watchEffect(() => {
 </script>
 
 <style scoped>
-/*
- * 全局颜色定义
- * 主题背景色：#87CEFA (Light Sky Blue)
- * 卡片背景色：#F0F8FF (Alice Blue)
- * 文本主色：#333333
- * 文本副色：#666666
- * 分割线颜色：#E8E8E8
- */
-
 #addPicturePage {
   width: 100%;
-  min-height: 100vh;
-  padding: 20px;
-  background-color: #f7fafd;
-  color: #333333;
-  display: flex;
-  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+  background: linear-gradient(140deg, #f5f7fa 0%, #e4e8ef 100%);
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
 }
 
 .content-container {
-  width: 100%;
-  max-width: 720px; /* 限制内容区域最大宽度 */
-  display: flex;
-  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* ===== 卡片公共样式 ===== */
@@ -321,102 +314,115 @@ watchEffect(() => {
 .upload-card,
 .edit-card,
 .form-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  background-color: #F0F8FF;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  margin-bottom: 16px;
-  width: 100%;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.header-card:hover,
+.upload-card:hover,
+.edit-card:hover,
+.form-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
 /* ===== 头部标题样式 ===== */
 .header-card {
-  padding: 16px;
+  padding: 24px;
 }
 
 .section-header {
   display: flex;
   align-items: center;
+  padding: 16px 0;
 }
 
-.section-title {
-  font-size: 18px;
-  font-weight: 500;
-  color: #333333;
-  position: relative;
-  padding-left: 10px;
+.title-container {
+  display: flex;
+  flex-direction: column;
+  margin-right: 24px;
 }
 
-.section-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
-  background-color: #87CEFA;
-  border-radius: 1.5px;
+.title-container h1 {
+  font-size: 28px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #1890ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.header-decoration {
+  height: 4px;
+  width: 60px;
+  background: linear-gradient(90deg, #1890ff, #722ed1);
+  border-radius: 2px;
+  margin-top: 8px;
 }
 
 .space-link {
-  margin: 0 0 0 8px;
-  padding: 0;
-  color: #666666;
+  margin: 0;
+  color: #666;
+  font-size: 14px;
 }
 
 /* ===== 上传选项卡样式 ===== */
 .upload-card {
-  padding: 16px;
+  padding: 24px;
 }
 
 .upload-tabs :deep(.ant-tabs-nav) {
-  margin-bottom: 16px;
+  margin: 0;
 }
 
 .upload-tabs :deep(.ant-tabs-tab) {
-  padding: 8px 16px;
+  padding: 12px 24px;
+  font-size: 15px;
 }
 
 .upload-tabs :deep(.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn) {
-  color: #87CEFA;
+  color: #1890ff;
 }
 
 .upload-tabs :deep(.ant-tabs-ink-bar) {
-  background-color: #87CEFA;
+  background: linear-gradient(90deg, #1890ff, #722ed1);
 }
 
 /* ===== 编辑工具栏样式 ===== */
 .edit-card {
-  padding: 16px;
+  padding: 24px;
 }
 
 .edit-bar {
-  display: flex;
-  justify-content: center;
-  margin: 8px 0;
+  margin: 16px 0;
 }
 
 .edit-button,
 .ai-button {
-  height: 38px;
-  border-radius: 4px;
+  height: 40px;
+  border-radius: 6px;
+  padding: 0 24px;
   transition: all 0.3s;
 }
 
 .ai-button {
-  background-color: #87CEFA;
-  border-color: #87CEFA;
+  background: linear-gradient(90deg, #1890ff, #722ed1);
+  border: none;
 }
 
 .ai-button:hover {
-  background-color: #75bdea;
-  border-color: #75bdea;
+  opacity: 0.9;
+  transform: translateY(-2px);
 }
 
 /* ===== 表单样式 ===== */
 .form-card {
-  padding: 24px;
+  padding: 32px;
 }
 
 .picture-form {
@@ -426,50 +432,60 @@ watchEffect(() => {
 .form-input,
 .form-textarea,
 .form-select {
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
   transition: all 0.3s;
-  width: 100%;
 }
 
 .form-input:hover,
 .form-textarea:hover,
 .form-select:hover {
-  border-color: #87CEFA;
+  border-color: #1890ff;
 }
 
 .form-input:focus,
 .form-textarea:focus,
 .form-select:focus {
-  border-color: #87CEFA;
-  box-shadow: 0 0 0 2px rgba(135, 206, 250, 0.2);
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
 .submit-button {
   width: 100%;
-  border-radius: 4px;
-  height: 40px;
-  font-weight: 500;
-  background-color: #87CEFA;
-  border-color: #87CEFA;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  height: 44px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #1890ff, #722ed1);
+  border: none;
+  font-size: 16px;
+  transition: all 0.3s;
 }
 
 .submit-button:hover {
-  background-color: #75bdea;
-  border-color: #75bdea;
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
 }
 
 /* 响应式适配 */
 @media (max-width: 768px) {
   #addPicturePage {
-    padding: 12px;
+    padding: 16px;
   }
 
-  .form-card,
+  .header-card,
+  .upload-card,
   .edit-card,
-  .upload-card {
+  .form-card {
     padding: 16px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .title-container h1 {
+    font-size: 24px;
   }
 }
 </style>

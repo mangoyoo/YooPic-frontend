@@ -33,6 +33,12 @@
               <template #overlay>
                 <a-menu>
                   <a-menu-item>
+                    <router-link to="/my_info">
+                      <UserOutlined />
+                      用户中心
+                    </router-link>
+                  </a-menu-item>
+                  <a-menu-item>
                     <router-link to="/my_space">
                       <UserOutlined />
                       我的空间

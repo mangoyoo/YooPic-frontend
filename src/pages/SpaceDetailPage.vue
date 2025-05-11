@@ -4,7 +4,7 @@
     <a-card class="space-header-card" :bordered="false">
       <a-row align="middle" :gutter="24">
         <!-- 左侧：空间信息 -->
-        <a-col :md="3" :sm="12" :xs="24">
+        <a-col :md="4" :sm="12" :xs="24">
           <div class="space-title">
             <h1>{{ space.spaceName }}</h1>
             <a-tag class="space-type-tag">{{ SPACE_TYPE_MAP[space.spaceType] }}</a-tag>
