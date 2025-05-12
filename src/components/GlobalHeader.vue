@@ -40,7 +40,7 @@
                   </a-menu-item>
                   <a-menu-item>
                     <router-link to="/my_space">
-                      <UserOutlined />
+                      <HomeOutlined />
                       我的空间
                     </router-link>
                   </a-menu-item>

@@ -48,7 +48,7 @@
               class="action-button upload-button"
             >
               <template #icon><PlusOutlined /></template>
-              创建图片
+              上传图片
             </a-button>
             <a-button
               v-if="canManageSpaceUser"

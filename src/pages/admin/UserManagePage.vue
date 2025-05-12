@@ -112,28 +112,6 @@
           <!-- 操作列 -->
           <template v-else-if="column.key === 'action'">
             <div class="action-buttons">
-              <a-tooltip title="编辑用户">
-                <a-button
-                  type="primary"
-                  ghost
-                  size="small"
-                  shape="circle"
-                  class="edit-btn action-icon-btn"
-                >
-                  <template #icon><EditOutlined /></template>
-                </a-button>
-              </a-tooltip>
-
-              <a-tooltip title="重置密码">
-                <a-button
-                  type="primary"
-                  size="small"
-                  shape="circle"
-                  class="reset-btn action-icon-btn"
-                >
-                  <template #icon><KeyOutlined /></template>
-                </a-button>
-              </a-tooltip>
 
               <a-tooltip title="删除用户">
                 <a-button

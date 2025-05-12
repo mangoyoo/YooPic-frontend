@@ -51,7 +51,7 @@ const shouldUseOverlay = computed(() => {
   overflow: hidden;
 }
 
-/* 为普通模式的标题添加更明显的点缀图案 */
+/* 为普通模式的标题添加更美观的图案 - 使用渐变和柔和的点状图案 */
 #basicLayout .normal-header::before {
   content: "";
   position: absolute;
@@ -60,10 +60,10 @@ const shouldUseOverlay = computed(() => {
   right: 0;
   bottom: 0;
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.4) 2%, transparent 3%),
-    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.4) 2%, transparent 3%);
-  background-size: 120px 120px;
-  opacity: 0.7;
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.5) 0%, transparent 25%),
+    radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.5) 0%, transparent 25%);
+  background-size: 80px 80px;
+  opacity: 0.4;
   z-index: 0;
 }
 
@@ -79,7 +79,7 @@ const shouldUseOverlay = computed(() => {
   z-index: 1;
 }
 
-/* 为普通全局头部添加更明显的点缀图案 */
+/* 为普通全局头部添加更美观的图案 - 使用柔和的波浪渐变 */
 :deep(.normal-global-header::before) {
   content: "";
   position: absolute;
@@ -88,12 +88,12 @@ const shouldUseOverlay = computed(() => {
   right: 0;
   bottom: 0;
   background-image:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%,
-    transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%,
-    transparent 75%, transparent);
-  background-size: 40px 40px;
+    radial-gradient(circle at 10% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 15%),
+    radial-gradient(circle at 90% 70%, rgba(255, 255, 255, 0.5) 0%, transparent 15%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 20%);
+  background-size: 120px 60px;
+  opacity: 0.5;
   z-index: -1;
-  opacity: 0.6;
 }
 
 :deep(.overlay-global-header) {
@@ -173,7 +173,7 @@ const shouldUseOverlay = computed(() => {
   background: transparent !important;
 }
 
-/* 添加整体内容区域的更明显点缀图案 */
+/* 添加整体内容区域的更美观点缀图案 - 使用柔和的气泡效果 */
 #basicLayout {
   position: relative;
 }
@@ -186,10 +186,12 @@ const shouldUseOverlay = computed(() => {
   right: 0;
   bottom: 0;
   background-image:
-    radial-gradient(circle at 10% 10%, rgba(173, 216, 230, 0.15) 2%, transparent 3%),
-    radial-gradient(circle at 90% 90%, rgba(173, 216, 230, 0.15) 2%, transparent 3%),
-    radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.1) 1%, transparent 2%);
-  background-size: 180px 180px;
+    radial-gradient(circle at 10% 10%, rgba(173, 216, 230, 0.2) 0%, transparent 8%),
+    radial-gradient(circle at 90% 20%, rgba(173, 216, 230, 0.2) 0%, transparent 6%),
+    radial-gradient(circle at 30% 70%, rgba(173, 216, 230, 0.15) 0%, transparent 10%),
+    radial-gradient(circle at 70% 90%, rgba(173, 216, 230, 0.15) 0%, transparent 5%),
+    radial-gradient(circle at 50% 50%, rgba(173, 216, 230, 0.1) 0%, transparent 12%);
+  background-size: 250px 250px;
   opacity: 0.7;
   z-index: -1;
   pointer-events: none;
