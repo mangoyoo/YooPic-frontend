@@ -6,6 +6,7 @@
         <router-link to="/">
           <div class="title-bar">
             <img class="logo" src="../assets/YooPic_logo.png" alt="logo" />
+
           </div>
         </router-link>
       </a-col>

@@ -14,7 +14,10 @@
             :key="category"
             :class="{ active: category === selectedCategory }"
             @click="selectedCategory = category; resetAndSearch()"
-          >{{ category }}</span>
+          >
+            {{ category }}
+            <i v-if="category === selectedCategory" class="close-icon" @click.stop="selectedCategory = 'all'; resetAndSearch()">×</i>
+          </span>
         </div>
         <div class="search-bar">
           <input
@@ -34,7 +37,10 @@
             class="tag"
             :class="{ 'active-tag': selectedTagList[index] }"
             @click.prevent="selectedTagList[index] = !selectedTagList[index]; resetAndSearch()"
-          >{{ tag }}</a>
+          >
+            {{ tag }}
+            <i v-if="selectedTagList[index]" class="close-icon" @click.stop="selectedTagList[index] = false; resetAndSearch()">×</i>
+          </a>
         </div>
       </div>
     </section>
@@ -348,7 +354,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 /* 全局样式重置 */
-* {
+• {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -384,11 +390,12 @@ onBeforeUnmount(() => {
   right: 0;
   bottom: 0;
   z-index: 0;
-  background: url('https://images.pexels.com/photos/12445797/pexels-photo-12445797.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=500&sharp=15&w=2000') center/cover no-repeat;
+  background: url('../assets/pexels-photo-12445797.webp') center/cover no-repeat;
   filter: brightness(1.1);
   width: 100%;
   height: 100%;
 }
+
 
 /* 添加背景遮罩 - 降低透明度使其更明亮 */
 .hero-bg:after {
@@ -441,12 +448,19 @@ onBeforeUnmount(() => {
   transition: all 0.2s ease;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: inline-flex;
+  align-items: center;
+  position: relative;
 }
 
 .media-tabs span.active, .media-tabs span:hover {
   background: rgba(255, 255, 255, 0.95);
   color: #222222; /* 深灰黑色 */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.media-tabs span.active {
+  padding-right: 12px;
 }
 
 .search-bar {
@@ -563,7 +577,9 @@ onBeforeUnmount(() => {
   border: none;
   font-size: 0.9rem;
   transition: all 0.3s ease;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
@@ -582,11 +598,36 @@ onBeforeUnmount(() => {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+  padding-right: 12px;
 }
 
 .popular-tags .active-tag:hover {
   background: rgba(255, 255, 255, 1);
   color: #000000; /* 黑色 */
+}
+
+/* 关闭图标样式 */
+.close-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: bold;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-icon:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+  transform: scale(1.1);
 }
 
 .hero-desc {
@@ -711,8 +752,15 @@ onBeforeUnmount(() => {
   width: 100%;
   padding: 16px 18px;
   background: rgba(0, 0, 0, 0);
-  transition: opacity 0.3s ease;
+  opacity: 0; /* 设置初始透明度为0 */
+  transform: translateY(10px); /* 添加上移效果 */
+  transition: all 0.3s ease;
   z-index: 5;
+}
+
+.image-wrapper:hover .waterfall-info {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .waterfall-title {

@@ -158,7 +158,7 @@
       <!-- 无数据提示 -->
       <a-empty v-else-if="dataList.length === 0" description="暂无图片" class="empty-container">
         <template #image>
-          <img src="../assets/empty-image.svg" alt="暂无图片" class="empty-image" />
+          <img  alt="暂无图片" class="empty-image" />
         </template>
         <a-button
           v-if="canUploadPicture"

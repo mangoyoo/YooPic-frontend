@@ -96,7 +96,7 @@
               placeholder="请输入分类"
               :options="categoryOptions"
               allow-clear
-              class="form-input"
+              class="form-auto-complete"
             />
           </a-form-item>
 
@@ -505,6 +505,43 @@ watchEffect(() => {
 
 .form-input {
   height: 46px; /* 增加高度使输入框更美观 */
+}
+
+/* 调整分类下拉框样式 */
+:deep(.form-auto-complete) {
+  width: 100%;
+}
+
+:deep(.form-auto-complete .ant-select-selector) {
+  border-radius: 8px !important;
+  height: 46px !important;
+  padding: 0 16px !important;
+  border: 1px solid #e6e8f0 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  background-color: white !important;
+}
+
+:deep(.form-auto-complete .ant-select-selection-search) {
+  height: 44px !important;
+  display: flex;
+  align-items: center;
+}
+
+:deep(.form-auto-complete .ant-select-selection-search-input) {
+  height: 100% !important;
+  padding: 0 !important;
+  line-height: 44px !important;
+  font-size: 15px;
+}
+
+:deep(.form-auto-complete:hover .ant-select-selector) {
+  border-color: #1890ff !important;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15) !important;
+}
+
+:deep(.form-auto-complete.ant-select-focused .ant-select-selector) {
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
 }
 
 /* 调整选择框样式 */

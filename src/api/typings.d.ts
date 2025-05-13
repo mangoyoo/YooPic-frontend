@@ -420,6 +420,8 @@ declare namespace API {
     count?: number
     namePrefix?: string
     searchText?: string
+    category?: string
+    tags?: string[]
   }
 
   type PictureUploadRequest = {
@@ -427,6 +429,8 @@ declare namespace API {
     id?: number
     picName?: string
     spaceId?: number
+    category?: string
+    tags?: string[]
   }
 
   type PictureVO = {

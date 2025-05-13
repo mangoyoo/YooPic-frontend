@@ -2,7 +2,7 @@
   <div class="yoopic-register-bg">
     <div class="register-card">
       <h1>YooPic</h1>
-      <div class="desc">企业级智能协同云图库</div>
+      <div class="desc">智能协同AI云图库</div>
 
       <a-form :model="formState" name="basic" autocomplete="off" @finish="handleSubmit" class="register-form">
         <a-form-item name="userAccount" :rules="[{ required: true, message: '请输入账号' }]">
@@ -101,7 +101,7 @@ const handleSubmit = async (values: any) => {
 .yoopic-register-bg {
   min-height: 100vh;
   width: 100%;
-  background: #e5e7eb url('https://images.pexels.com/photos/255379/pexels-photo-255379.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80') no-repeat;
+  background: #e5e7eb url('../../assets/pexels-photo-255379.webp') no-repeat;
   background-size: cover;
   background-position: center;
   background-attachment: fixed; /* 保持背景图固定，不随滚动 */
@@ -111,6 +111,7 @@ const handleSubmit = async (values: any) => {
   position: relative;
   overflow: hidden; /* 确保图片不会溢出 */
 }
+
 
 /* 添加覆盖层使图片稍微变暗，提高表单可读性 */
 .yoopic-register-bg::before {

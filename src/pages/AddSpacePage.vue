@@ -193,13 +193,17 @@ const getOldSpace = async () => {
 
 // 提交表单
 const handleSubmit = async (values: any) => {
+  console.log('提交表单 spaceForm:', spaceForm)
+  console.log('提交表单 spaceLevel:', spaceForm.spaceLevel, typeof spaceForm.spaceLevel)
+
   // 表单验证
   if (!spaceForm.spaceName) {
     message.warning('请输入空间名称')
     return
   }
 
-  if (!spaceForm.spaceLevel) {
+  // 修正验证逻辑，处理spaceLevel可能为0的情况
+  if (spaceForm.spaceLevel === undefined || spaceForm.spaceLevel === null || spaceForm.spaceLevel === '') {
     message.warning('请选择空间级别')
     return
   }
