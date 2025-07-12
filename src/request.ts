@@ -2,11 +2,12 @@ import axios from "axios";
 import {message} from "ant-design-vue";
 
 // 区分开发和生产环境
-// const DEV_BASE_URL = "http://localhost:8123";
-const PROD_BASE_URL = "http://117.72.62.49";
+const DEV_BASE_URL = "http://localhost:8123";
+ //const PROD_BASE_URL = "http://117.72.62.49";
+//const PROD_BASE_URL = "http://www.yoopic.space";
 // 创建 Axios 实例
 const myAxios = axios.create({
-    baseURL: PROD_BASE_URL,
+    baseURL: DEV_BASE_URL,
     timeout: 10000,
     withCredentials: true,
 });

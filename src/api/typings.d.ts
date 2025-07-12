@@ -747,4 +747,18 @@ declare namespace API {
   type UserPictureCountRequest = {
     userId?: number
   }
+  // AI聊天相关的请求类型
+  interface LoveAppChatRequest {
+    message: string;
+    chatId: string;
+  }
+  interface ManusChatRequest {
+    message: string;
+  }
+  // 如果需要特定的响应类型，可以定义
+  interface BaseResponseString_ {
+    code?: number;
+    data?: string;
+    message?: string;
+  }
 }

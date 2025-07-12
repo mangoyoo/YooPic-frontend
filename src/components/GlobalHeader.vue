@@ -75,6 +75,7 @@ import {
   UploadOutlined,
   AppstoreOutlined,
   SettingOutlined,
+  RobotOutlined,
   FileImageOutlined
 } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
@@ -84,13 +85,14 @@ import { userLogoutUsingPost } from '@/api/userController.ts'
 import { SPACE_TYPE_ENUM } from '@/constants/space.ts'
 import { listMyTeamSpaceUsingPost } from '@/api/spaceUserController.ts'
 
+
 const loginUserStore = useLoginUserStore()
 const router = useRouter()
 
 // 团队空间列表
 const teamSpaceList = ref<API.SpaceUserVO[]>([])
 
-// 基础菜单项 - 交换了云空间和发布图片的位置
+// 基础菜单项 -
 const fixedMenuItems = [
   {
     key: '/',
@@ -107,6 +109,11 @@ const fixedMenuItems = [
     key: '/my_space',
     label: '云空间',
     icon: () => h(CloudOutlined),
+  },
+  {
+    key: '/yoopic_agent',
+    label: 'YooPic-智能体',
+    icon: () => h(RobotOutlined),
   },
 ]
 
