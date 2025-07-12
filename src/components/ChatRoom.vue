@@ -10,7 +10,25 @@
           <div class="avatar ai-avatar">
             <AiAvatarFallback :type="aiType" />
           </div>
-          <div class="message-bubble">
+
+          <!-- 文件消息 -->
+          <div v-if="msg.type === 'ai-file' && msg.fileInfo" class="message-bubble file-message-bubble">
+            <div class="file-container" @click="openFile(msg.fileInfo.url)">
+              <div class="file-icon">{{ msg.fileInfo.icon }}</div>
+              <div class="file-details">
+                <div class="file-name">{{ msg.fileInfo.name }}</div>
+                <div class="file-info">
+                  <span class="file-type">{{ msg.fileInfo.type }}</span>
+                  <span v-if="msg.fileInfo.size" class="file-size">{{ msg.fileInfo.size }}</span>
+                </div>
+              </div>
+              <div class="download-icon">⬇️</div>
+            </div>
+            <div class="message-time">{{ formatTime(msg.time) }}</div>
+          </div>
+
+          <!-- 普通文本消息 -->
+          <div v-else class="message-bubble">
             <div class="message-content">
               <span v-if="msg.content === '正在思考中...' || (connectionStatus === 'connecting' && index === messages.length - 1)"
                     class="loading-text">
@@ -135,6 +153,11 @@ const aiAvatar = computed(() => {
     ? '/ai-love-avatar.png'
     : '/ai-super-avatar.png'
 })
+
+// 打开文件的函数
+const openFile = (url) => {
+  window.open(url, '_blank')
+}
 
 // 触发文件选择
 const triggerFileInput = () => {
@@ -354,6 +377,96 @@ onMounted(() => {
   opacity: 0.7;
   margin-top: 4px;
   text-align: right;
+}
+
+/* 文件消息样式 */
+.file-message-bubble {
+  padding: 0 !important;
+  background-color: transparent !important;
+}
+
+.file-container {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 300px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.file-container:hover {
+  background-color: #e9ecef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-icon {
+  font-size: 24px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.file-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.file-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.file-type {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.file-size {
+  color: #6c757d;
+  font-size: 11px;
+}
+
+.download-icon {
+  margin-left: 8px;
+  font-size: 16px;
+  opacity: 0.7;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.file-container:hover .download-icon {
+  opacity: 1;
+}
+
+/* 文件消息的时间样式 */
+.file-message-bubble .message-time {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+  text-align: left;
+  color: #666;
+  padding-left: 4px;
 }
 
 .chat-input-container {
@@ -630,6 +743,20 @@ onMounted(() => {
   .send-button {
     height: 36px;
     min-width: 50px;
+  }
+
+  .file-container {
+    max-width: 250px;
+    padding: 10px 12px;
+  }
+
+  .file-name {
+    font-size: 13px;
+  }
+
+  .file-icon {
+    font-size: 20px;
+    margin-right: 10px;
   }
 }
 </style>

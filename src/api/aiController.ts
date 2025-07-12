@@ -202,33 +202,21 @@ export function chatWithLoveAppSSEWithFile(
   )
 }
 
-/** AI超级智能体聊天 POST /api/ai/manus/chat */
-export async function chatWithManusUsingPost(
-  body: API.ManusChatRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseString_>('/api/ai/manus/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  })
-}
-
-/** AI超级智能体聊天SSE POST /api/ai/manus/chat/sse */
-export function chatWithManusSSE(
-  message: string,
-  onMessage?: (data: string) => void,
-  onError?: (error: Event) => void
-): EventSource {
-  return connectSSE('/ai/manus/chat/sse', { message }, onMessage, onError)
-}
-
 // 为了向后兼容，保留原有的函数名
 export const chatWithLoveApp = chatWithLoveAppSSE
-export const chatWithManus = chatWithManusSSE
+// api/aiController.ts 或相关文件
+export function chatWithManus(message: string): EventSource {
+  // 🔥 修复：使用getApiBaseUrl()构造完整URL
+  const encodedMessage = encodeURIComponent(message);
+  const fullUrl = `${getApiBaseUrl()}/ai/manus/chat/see?message=${encodedMessage}`;
+                                                http://localhost:8123/api/ai/my_app/chat/sse
+  console.log('SSE URL:', fullUrl); // 应该输出：http://localhost:8123/api/ai/manus/chat/see?message=...
+
+  const eventSource = new EventSource(fullUrl);
+  return eventSource;
+}
+
+
 // 新增：AI恋爱大师聊天，支持文件上传 POST /api/ai/my_app/chat/sse（返回String）
 export async function chatWithLoveAppWithFile(
   message: string,
@@ -255,10 +243,8 @@ export default {
   chatWithLoveApp,
   chatWithManus,
   chatWithLoveAppUsingPost,
-  chatWithManusUsingPost,
   chatWithLoveAppSSE,
   chatWithLoveAppSSEWithFile, // 新增的支持文件上传的函数
-  chatWithManusSSE,
   chatWithLoveAppWithFile,
   connectSSE,
   connectSSEWithFile // 新增的支持文件上传的SSE连接函数
