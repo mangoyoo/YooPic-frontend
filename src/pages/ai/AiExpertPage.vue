@@ -66,6 +66,38 @@
             <div class="message-bubble">
               <!-- 图片预览 -->
               <!-- 图片预览 - 修改为小预览图 -->
+              <!-- 文件显示 -->
+              <!-- 替换现有的文件显示部分 -->
+              <div v-if="message.type === 'ai-file' && message.fileInfo" class="file-display">
+                <div class="file-item" @click="previewFile(message.fileInfo)">
+                  <div class="file-icon">{{ message.fileInfo.icon }}</div>
+                  <div class="file-info">
+                    <div class="file-name">{{ message.fileInfo.name }}</div>
+                    <div class="file-meta">
+                      <span class="file-type">{{ message.fileInfo.type.toUpperCase() }}</span>
+                      <span v-if="message.fileInfo.size" class="file-size">{{ message.fileInfo.size }}</span>
+                    </div>
+                  </div>
+                  <div class="file-actions">
+                    <!-- 预览按钮 -->
+                    <button class="file-preview" @click.stop="previewFile(message.fileInfo)" title="预览文件">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </button>
+                    <!-- 下载按钮 -->
+                    <button class="file-download" @click.stop="downloadFile(message.fileInfo.url, message.fileInfo.name)" title="下载文件">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div v-if="message.imageUrl" class="message-image-preview">
                 <div class="message-image-container" @click="previewImage(message.imageUrl)">
                   <img :src="message.imageUrl" alt="上传的图片" />
@@ -88,11 +120,11 @@
                   <div class="typing-dot"></div>
                   <div class="typing-dot"></div>
                 </div>
-                <span class="typing-text">AI 正在分析...</span>
+                <span class="typing-text">分析中...</span>
               </div>
 
               <!-- 消息内容 -->
-              <div v-else class="message-text" v-html="formatMessage(message.content)"></div>
+              <div v-else class="message-text" v-html="formatMessageok(message.content)"></div>
 
               <!-- 消息时间和状态 -->
               <div v-if="message.content" class="message-footer">
@@ -235,17 +267,92 @@
     />
 
     <!-- 图片预览模态框 -->
-    <div v-if="previewImageUrl" class="image-modal" @click="closeImagePreview">
+    <!-- 替换现有的图片预览模态框 -->
+    <div v-if="previewImageUrl" class="file-modal" @click="closeFilePreview">
       <div class="modal-backdrop"></div>
       <div class="modal-content" @click.stop>
-        <button class="modal-close" @click="closeImagePreview">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <img :src="previewImageUrl" alt="图片预览" />
+        <div class="modal-header">
+          <div v-if="previewFileInfo" class="modal-title">
+            <span class="file-icon-large">{{ previewFileInfo.icon }}</span>
+            <div class="file-details">
+              <div class="file-name-large">{{ previewFileInfo.name }}</div>
+              <div class="file-meta-large">
+                <span class="file-type-large">{{ previewFileInfo.type.toUpperCase() }}</span>
+                <span v-if="previewFileInfo.size" class="file-size-large">{{ previewFileInfo.size }}</span>
+              </div>
+            </div>
+          </div>
+          <button class="modal-close" @click="closeFilePreview">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- 图片预览 -->
+          <div v-if="previewFileInfo?.type === 'image'" class="image-preview-container">
+            <img :src="previewImageUrl" :alt="previewFileInfo.name" />
+          </div>
+
+          <!-- PDF预览 -->
+          <div v-else-if="previewFileInfo?.name.toLowerCase().endsWith('.pdf')" class="pdf-preview-container">
+            <iframe :src="previewImageUrl" frameborder="0"></iframe>
+          </div>
+
+          <!-- 视频预览 -->
+          <div v-else-if="previewFileInfo?.type === 'video'" class="video-preview-container">
+            <video controls :src="previewImageUrl" preload="metadata">
+              您的浏览器不支持视频播放
+            </video>
+          </div>
+
+          <!-- 音频预览 -->
+          <div v-else-if="previewFileInfo?.type === 'audio'" class="audio-preview-container">
+            <audio controls :src="previewImageUrl" preload="metadata">
+              您的浏览器不支持音频播放
+            </audio>
+            <div class="audio-placeholder">
+              <div class="audio-icon">🎵</div>
+              <div class="audio-name">{{ previewFileInfo.name }}</div>
+            </div>
+          </div>
+
+          <!-- 文本内容预览 -->
+          <div v-else-if="previewImageUrl === 'text-content'" class="text-preview-container">
+            <pre class="text-content">{{ previewFileContent }}</pre>
+          </div>
+
+          <!-- 不支持预览的文件类型 -->
+          <div v-else class="unsupported-preview">
+            <div class="unsupported-icon">📄</div>
+            <div class="unsupported-message">
+              <p>无法预览此文件类型</p>
+              <button class="download-button" @click="downloadFile(previewFileInfo.url, previewFileInfo.name)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                下载文件
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-download-btn" @click="downloadFile(previewFileInfo.url, previewFileInfo.name)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            下载
+          </button>
+        </div>
       </div>
     </div>
+
 
     <!-- 背景装饰 -->
     <div class="background-decoration">
@@ -264,6 +371,210 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { chatWithExpertWithFile } from '@/api/aiController'
 
 const loginUserStore = useLoginUserStore()
+
+// 在现有的响应式数据后添加
+const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mp3', 'wav', 'flac', 'aac', 'ogg', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z', 'tar', 'gz', 'html']
+
+// 检测文件类型
+const getFileType = (url) => {
+  const extension = url.split('.').pop().toLowerCase()
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']
+  const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm']
+  const audioExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg']
+  const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt']
+  const archiveExtensions = ['zip', 'rar', '7z', 'tar', 'gz']
+
+  if (imageExtensions.includes(extension)) return 'image'
+  if (videoExtensions.includes(extension)) return 'video'
+  if (audioExtensions.includes(extension)) return 'audio'
+  if (documentExtensions.includes(extension)) return 'document'
+  if (archiveExtensions.includes(extension)) return 'archive'
+  return 'other'
+}
+
+// 获取文件图标
+const getFileIcon = (fileType) => {
+  const icons = {
+    image: '🖼️',
+    video: '🎥',
+    audio: '🎵',
+    document: '📄',
+    archive: '📦',
+    other: '📎'
+  }
+  return icons[fileType] || '📎'
+}
+
+// 获取文件大小
+const getFileSize = async (url) => {
+  try {
+    const response = await fetch(url, {method: 'HEAD'})
+    const contentLength = response.headers.get('content-length')
+    if (contentLength) {
+      const bytes = parseInt(contentLength)
+      if (bytes < 1024) return `${bytes} B`
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+      if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+      return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+    }
+  } catch (error) {
+    console.log('无法获取文件大小:', error)
+  }
+  return ''
+}
+
+// 检测并提取文件链接
+const extractFileLinks = (text) => {
+  const fileLinks = new Set()
+
+  // 方法1: 使用正则表达式匹配所有URL
+  const extensionPattern = supportedExtensions.join('|')
+  const urlRegex = new RegExp(`https?://[^\\s\\r\\n<>"{}|\\\\^` + "`" + `\\[\\]]+\\.(${extensionPattern})(?:[?#][^\\s\\r\\n<>"{}|\\\\^` + "`" + `\\[\\]]*)?`, 'gi')
+  const regexMatches = text.match(urlRegex)
+  if (regexMatches) {
+    regexMatches.forEach(match => fileLinks.add(match))
+  }
+
+  // 方法2: 按多种分隔符分割并检查每个部分
+  const separators = [',', ' ', '\n', '\r', '\t', ';', '|']
+  separators.forEach(separator => {
+    const parts = text.split(separator)
+    parts.forEach(part => {
+      const trimmed = part.trim()
+      if (trimmed) {
+        const urlPattern = /^https?:\/\/[^\s]+$/
+        if (urlPattern.test(trimmed)) {
+          const urlWithoutParams = trimmed.split('?')[0].split('#')[0]
+          const extension = urlWithoutParams.split('.').pop().toLowerCase()
+          if (supportedExtensions.includes(extension)) {
+            fileLinks.add(trimmed)
+          }
+        }
+      }
+    })
+  })
+
+  // 方法3: 处理可能包含在括号、引号等符号中的URL
+  const bracketPatterns = [
+    /\[([^\]]+)\]/g,
+    /\(([^\)]+)\)/g,
+    /"([^"]+)"/g,
+    /'([^']+)'/g,
+    /`([^`]+)`/g,
+    /<([^>]+)>/g
+  ]
+
+  bracketPatterns.forEach(pattern => {
+    let match
+    while ((match = pattern.exec(text)) !== null) {
+      const url = match[1].trim()
+      const urlPattern = /^https?:\/\/[^\s]+$/
+      if (urlPattern.test(url)) {
+        const urlWithoutParams = url.split('?')[0].split('#')[0]
+        const extension = urlWithoutParams.split('.').pop().toLowerCase()
+        if (supportedExtensions.includes(extension)) {
+          fileLinks.add(url)
+        }
+      }
+    }
+  })
+
+  // 方法4: 查找可能被其他字符包围的URL
+  const generalUrlRegex = /https?:\/\/[^\s<>"{}|\\^`\[\]]+/gi
+  const generalMatches = text.match(generalUrlRegex)
+  if (generalMatches) {
+    generalMatches.forEach(url => {
+      const cleanUrl = url.replace(/[.,;:!?]*$/, '')
+      const urlWithoutParams = cleanUrl.split('?')[0].split('#')[0]
+      const extension = urlWithoutParams.split('.').pop().toLowerCase()
+      if (supportedExtensions.includes(extension)) {
+        fileLinks.add(cleanUrl)
+      }
+    })
+  }
+
+  return Array.from(fileLinks)
+}
+// 在现有的响应式数据中添加
+const previewFileInfo = ref(null) // 当前预览的文件信息
+const previewFileContent = ref('') // 文件内容（用于文本文件）
+
+// 文件预览函数
+const previewFile = async (fileInfo) => {
+  previewFileInfo.value = fileInfo
+
+  // 根据文件类型处理预览
+  switch (fileInfo.type) {
+    case 'image':
+      // 图片直接使用URL
+      previewImageUrl.value = fileInfo.url
+      break
+
+    case 'document':
+      if (fileInfo.name.toLowerCase().endsWith('.pdf')) {
+        // PDF文件
+        previewImageUrl.value = fileInfo.url
+      } else {
+        // 其他文档类型，尝试获取文本内容
+        await loadTextContent(fileInfo.url)
+      }
+      break
+
+    case 'video':
+    case 'audio':
+      // 视频和音频文件直接使用URL
+      previewImageUrl.value = fileInfo.url
+      break
+
+    default:
+      // 其他文件类型，尝试作为文本处理
+      await loadTextContent(fileInfo.url)
+      break
+  }
+}
+
+// 加载文本内容
+const loadTextContent = async (url) => {
+  try {
+    const response = await fetch(url)
+    if (response.ok) {
+      const text = await response.text()
+      previewFileContent.value = text
+      previewImageUrl.value = 'text-content' // 标记为文本内容
+    } else {
+      previewFileContent.value = '无法加载文件内容'
+      previewImageUrl.value = 'text-content'
+    }
+  } catch (error) {
+    console.error('加载文件内容失败:', error)
+    previewFileContent.value = '加载文件内容时出错'
+    previewImageUrl.value = 'text-content'
+  }
+}
+
+// 关闭文件预览
+const closeFilePreview = () => {
+  previewImageUrl.value = null
+  previewFileInfo.value = null
+  previewFileContent.value = ''
+}
+
+// 修改现有的 closeImagePreview 函数
+const closeImagePreview = () => {
+  closeFilePreview()
+}
+
+// 下载文件
+const downloadFile = (url, filename) => {
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.target = '_blank'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 // 设置页面标题和元数据
 useHead({
   title: 'AI 图像顾问 - 智能视觉分析助手',
@@ -318,29 +629,107 @@ const getUserInitial = () => {
 }
 
 // 添加消息
-const addMessage = (content, isUser, imageUrl = null, type = null) => {
+// 修改现有的 addMessage 函数
+// 修改现有的 addMessage 函数
+const addMessage = (content, isUser, imageUrl = null, type = null, fileInfo = null) => {
   messages.value.push({
     content,
     isUser,
     imageUrl,
     type: type || (isUser ? 'user-message' : 'ai-message'),
-    time: new Date().getTime()
+    time: new Date().getTime(),
+    fileInfo // 添加文件信息字段
   })
 
   nextTick(() => {
     scrollToBottom()
   })
 }
+// 在现有函数后添加
+// 添加一个Set来跟踪已处理的消息，避免重复处理
+const processedMessages = new Set()
+
+// 修改 processMessageWithFiles 函数
+const processMessageWithFiles = async (content, type = 'ai-message') => {
+  // 创建内容的唯一标识符
+  const contentId = content + '_' + Date.now()
+
+  // 如果已经处理过这个内容，直接返回
+  if (processedMessages.has(content)) {
+    addMessage(content, false, null, type)
+    return
+  }
+
+  const fileLinks = extractFileLinks(content)
+
+  if (fileLinks.length === 0) {
+    // 没有文件链接，正常显示
+    addMessage(content, false, null, type)
+    return
+  }
+
+  // 标记为已处理
+  processedMessages.add(content)
+
+  // 分离文本和文件链接
+  let textContent = content
+  const fileInfos = []
+
+  // 移除所有检测到的文件链接
+  fileLinks.forEach(link => {
+    const escapedLink = link.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const linkRegex = new RegExp(escapedLink, 'g')
+    textContent = textContent.replace(linkRegex, '')
+  })
+
+  // 清理多余的分隔符和空格
+  textContent = textContent
+    .replace(/[,\s]+/g, ' ')
+    .replace(/^\s*[,;|]\s*|\s*[,;|]\s*$/g, '')
+    .trim()
+
+  for (const link of fileLinks) {
+    const fileType = getFileType(link)
+    const fileName = link.split('/').pop().split('?')[0]
+    const fileIcon = getFileIcon(fileType)
+    const fileSize = await getFileSize(link)
+
+    fileInfos.push({
+      url: link,
+      type: fileType,
+      name: fileName,
+      icon: fileIcon,
+      size: fileSize
+    })
+  }
+
+  // 如果有文本内容，先显示文本
+  if (textContent) {
+    addMessage(textContent, false, null, type)
+  }
+
+  // 为每个文件创建单独的消息气泡
+  fileInfos.forEach(fileInfo => {
+    addMessage('', false, null, 'ai-file', fileInfo)
+  })
+}
+
+
+
 
 // 格式化消息内容
-const formatMessage = (content) => {
-  // 支持 Markdown 格式
+// 替换现有的 formatMessageok 函数
+// 替换现有的 formatMessageok 函数，移除文件检测逻辑
+const formatMessageok = (content) => {
+  // 只处理 Markdown 格式，不在这里检测文件链接
   return content
     .replace(/\n/g, '<br>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
 }
+
+
 
 // 格式化时间
 const formatTime = (timestamp) => {
@@ -514,6 +903,7 @@ const sendMessage = () => {
 
 // 修改 sendMessageWithImages 函数
 // 临时调试版本 - 帮助我们理解真实的API响应
+// 修改 sendMessageWithImages 函数中处理AI响应的部分
 const sendMessageWithImages = async (message, images = []) => {
   if (!message.trim() && images.length === 0) return
 
@@ -541,40 +931,37 @@ const sendMessageWithImages = async (message, images = []) => {
 
     const response = await chatWithExpertWithFile(message, chatId.value, file)
 
-    // 详细打印响应信息
     console.log('响应类型:', typeof response)
     console.log('响应内容:', response)
-    console.log('响应结构:', JSON.stringify(response, null, 2))
 
-    // 根据实际响应结构处理
     let aiResponse = ''
 
     if (typeof response === 'string') {
-      // 如果直接返回字符串
       aiResponse = response
     } else if (response && response.code === 0 && response.data) {
-      // 标准的API响应格式
       aiResponse = response.data
     } else if (response && response.data) {
-      // 没有code字段但有data字段
       aiResponse = response.data
     } else if (response && response.message) {
-      // 只有message字段
       aiResponse = response.message
     } else {
-      // 其他情况
       aiResponse = String(response)
     }
 
-    messages.value[loadingMessageIndex].content = aiResponse
-    messages.value[loadingMessageIndex].type = 'ai-message'
+    // 移除加载消息
+    messages.value.splice(loadingMessageIndex, 1)
+
+    // 处理AI响应中的文件链接
+    await processMessageWithFiles(aiResponse, 'ai-message')
+
     connectionStatus.value = 'disconnected'
 
   } catch (error) {
     console.error('API调用失败:', error)
 
-    messages.value[loadingMessageIndex].content = `抱歉，AI服务暂时不可用：${error.message || error}`
-    messages.value[loadingMessageIndex].type = 'ai-error'
+    // 移除加载消息并添加错误消息
+    messages.value.splice(loadingMessageIndex, 1)
+    addMessage(`抱歉，AI服务暂时不可用：${error.message || error}`, false, null, 'ai-error')
     connectionStatus.value = 'error'
   }
 }
@@ -597,9 +984,7 @@ const previewImage = (imageUrl) => {
   previewImageUrl.value = imageUrl
 }
 
-const closeImagePreview = () => {
-  previewImageUrl.value = null
-}
+
 
 // 返回
 const goBack = () => {
@@ -2627,6 +3012,472 @@ watch(messages, () => {
 .message-image-container img:not([src])::before,
 .message-image-container img[src=""]::before {
   content: '图片加载失败';
+}
+/* 文件显示样式 */
+.file-display {
+  margin-bottom: 0.75rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
+  border: 1px solid rgba(203, 213, 225, 0.4);
+  border-radius: 1rem;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.file-item:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(241, 245, 249, 0.9));
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.25);
+}
+
+.file-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--background-tertiary), var(--background-secondary));
+  border-radius: 0.75rem;
+  border: 1px solid rgba(203, 213, 225, 0.3);
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+}
+
+.file-meta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.file-type {
+  font-weight: 500;
+  padding: 0.125rem 0.375rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-blue);
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.file-size {
+  color: var(--text-secondary);
+}
+
+.file-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+  color: white;
+  text-decoration: none;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.file-download:hover {
+  background: linear-gradient(135deg, var(--primary-blue-light), var(--secondary-purple));
+  transform: scale(1.05);
+}
+
+/* 用户消息中的文件样式 */
+.user-message .file-item {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-message .file-item:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.user-message .file-name {
+  color: white;
+}
+
+.user-message .file-type {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.user-message .file-size {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.user-message .file-icon {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .file-item {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .file-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.25rem;
+  }
+
+  .file-download {
+    width: 32px;
+    height: 32px;
+  }
+}
+/* 修改原有的文件显示样式 */
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
+  border: 1px solid rgba(203, 213, 225, 0.4);
+  border-radius: 1rem;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer; /* 添加点击手势 */
+}
+
+.file-item:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(241, 245, 249, 0.9));
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.25);
+}
+
+.file-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.file-preview,
+.file-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 0.625rem;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.file-preview {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+  color: var(--primary-blue);
+}
+
+.file-preview:hover {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+  color: white;
+  transform: scale(1.05);
+}
+
+.file-download {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+  color: var(--accent-emerald);
+}
+
+.file-download:hover {
+  background: linear-gradient(135deg, var(--accent-emerald), #059669);
+  color: white;
+  transform: scale(1.05);
+}
+
+/* 文件预览模态框样式 */
+.file-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.file-modal .modal-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 800px;
+  background: white;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-2xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--background-secondary);
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.file-icon-large {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--background-tertiary), var(--background-secondary));
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-light);
+}
+
+.file-details {
+  flex: 1;
+}
+
+.file-name-large {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+}
+
+.file-meta-large {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+}
+
+.file-type-large {
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-blue);
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.modal-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  min-height: 400px;
+  overflow: auto;
+}
+
+/* 不同文件类型的预览样式 */
+.image-preview-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-preview-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius);
+}
+
+.pdf-preview-container {
+  width: 100%;
+  height: 600px;
+}
+
+.pdf-preview-container iframe {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+}
+
+.video-preview-container {
+  width: 100%;
+  max-width: 720px;
+}
+
+.video-preview-container video {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.audio-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.audio-preview-container audio {
+  width: 100%;
+  max-width: 400px;
+}
+
+.audio-placeholder {
+  text-align: center;
+}
+
+.audio-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.audio-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.text-preview-container {
+  width: 100%;
+  height: 100%;
+  max-height: 600px;
+  overflow: auto;
+}
+
+.text-content {
+  white-space: pre-wrap;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--background-secondary);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  margin: 0;
+}
+
+.unsupported-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem;
+  text-align: center;
+}
+
+.unsupported-icon {
+  font-size: 4rem;
+  opacity: 0.6;
+}
+
+.unsupported-message p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.download-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.download-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-light);
+  background: var(--background-secondary);
+}
+
+.modal-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--accent-emerald), #059669);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-download-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .file-modal .modal-content {
+    width: 95vw;
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+    min-height: 300px;
+  }
+
+  .pdf-preview-container {
+    height: 400px;
+  }
 }
 
 </style>
