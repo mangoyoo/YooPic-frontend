@@ -217,8 +217,8 @@ export function chatWithManus(message: string): EventSource {
 }
 
 
-// 新增：AI恋爱大师聊天，支持文件上传 POST /api/ai/my_app/chat/sse（返回String）
-export async function chatWithLoveAppWithFile(
+// 支持文件上传 POST /api/ai/my_app/chat/sse（返回String）
+export async function chatWithExpertWithFile(
   message: string,
   chatId: string,
   file?: File
@@ -245,7 +245,7 @@ export default {
   chatWithLoveAppUsingPost,
   chatWithLoveAppSSE,
   chatWithLoveAppSSEWithFile, // 新增的支持文件上传的函数
-  chatWithLoveAppWithFile,
+  chatWithExpertWithFile,
   connectSSE,
   connectSSEWithFile // 新增的支持文件上传的SSE连接函数
 }

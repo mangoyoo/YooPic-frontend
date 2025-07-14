@@ -25,6 +25,9 @@ import { useRouter } from 'vue-router'
 import { useHead } from '@vueuse/head'
 import ChatRoom from '@/components/ChatRoom.vue'
 import { chatWithManus } from '@/api/aiController.ts'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
+
+const loginUserStore = useLoginUserStore()
 
 // 设置页面标题和元数据
 useHead({
@@ -44,7 +47,13 @@ useHead({
 const router = useRouter()
 const messages = ref([])
 const connectionStatus = ref('disconnected')
+const chatId = ref('') // 添加缺失的变量
 let eventSource = null
+
+// 生成聊天ID的函数
+const generateChatId = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2)
+}
 
 // 检测文件类型
 const getFileType = (url) => {
@@ -79,7 +88,7 @@ const getFileIcon = (fileType) => {
 // 获取文件大小（如果可能的话）
 const getFileSize = async (url) => {
   try {
-    const response = await fetch(url, { method: 'HEAD' })
+    const response = await fetch(url, {method: 'HEAD'})
     const contentLength = response.headers.get('content-length')
     if (contentLength) {
       const bytes = parseInt(contentLength)
@@ -94,40 +103,84 @@ const getFileSize = async (url) => {
   return ''
 }
 
-// 检测并提取文件链接 - 修改后的版本
+// 检测并提取文件链接 - 改进版本
 const extractFileLinks = (text) => {
   // 支持的文件扩展名
-  const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mp3', 'wav', 'flac', 'aac', 'ogg', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z', 'tar', 'gz','html']
+  const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mp3', 'wav', 'flac', 'aac', 'ogg', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', '7z', 'tar', 'gz', 'html']
 
-  const fileLinks = []
+  const fileLinks = new Set() // 使用Set避免重复
 
-  // 方法1: 处理可能的逗号分隔链接
-  // 先按逗号分割，然后检查每个部分是否是有效的URL
-  const commaSeparated = text.split(',')
-  commaSeparated.forEach(part => {
-    const trimmed = part.trim()
-    // 检查是否是完整的URL且以支持的扩展名结尾
-    const urlRegex = /^https?:\/\/[^\s]+$/
-    if (urlRegex.test(trimmed)) {
-      const extension = trimmed.split('.').pop().toLowerCase().split('?')[0] // 移除查询参数
-      if (supportedExtensions.includes(extension)) {
-        fileLinks.push(trimmed)
+  // 方法1: 使用更全面的正则表达式匹配所有URL
+  const extensionPattern = supportedExtensions.join('|')
+  // 更强的正则表达式，匹配各种可能的URL格式
+  const urlRegex = new RegExp(`https?://[^\\s\\r\\n<>"{}|\\\\^` + "`" + `\\[\\]]+\\.(${extensionPattern})(?:[?#][^\\s\\r\\n<>"{}|\\\\^` + "`" + `\\[\\]]*)?`, 'gi')
+  const regexMatches = text.match(urlRegex)
+  if (regexMatches) {
+    regexMatches.forEach(match => fileLinks.add(match))
+  }
+
+  // 方法2: 按多种分隔符分割并检查每个部分
+  const separators = [',', ' ', '\n', '\r', '\t', ';', '|']
+  separators.forEach(separator => {
+    const parts = text.split(separator)
+    parts.forEach(part => {
+      const trimmed = part.trim()
+      if (trimmed) {
+        // 检查是否是完整的URL且以支持的扩展名结尾
+        const urlPattern = /^https?:\/\/[^\s]+$/
+        if (urlPattern.test(trimmed)) {
+          // 提取扩展名（移除查询参数和锚点）
+          const urlWithoutParams = trimmed.split('?')[0].split('#')[0]
+          const extension = urlWithoutParams.split('.').pop().toLowerCase()
+          if (supportedExtensions.includes(extension)) {
+            fileLinks.add(trimmed)
+          }
+        }
+      }
+    })
+  })
+
+  // 方法3: 处理可能包含在括号、引号等符号中的URL
+  const bracketPatterns = [
+    /\[([^\]]+)\]/g,  // [url]
+    /\(([^\)]+)\)/g,  // (url)
+    /"([^"]+)"/g,     // "url"
+    /'([^']+)'/g,     // 'url'
+    /`([^`]+)`/g,     // `url`
+    /<([^>]+)>/g      // <url>
+  ]
+
+  bracketPatterns.forEach(pattern => {
+    let match
+    while ((match = pattern.exec(text)) !== null) {
+      const url = match[1].trim()
+      const urlPattern = /^https?:\/\/[^\s]+$/
+      if (urlPattern.test(url)) {
+        const urlWithoutParams = url.split('?')[0].split('#')[0]
+        const extension = urlWithoutParams.split('.').pop().toLowerCase()
+        if (supportedExtensions.includes(extension)) {
+          fileLinks.add(url)
+        }
       }
     }
   })
 
-  // 方法2: 如果方法1没找到链接，使用传统的正则匹配
-  if (fileLinks.length === 0) {
-    const extensionPattern = supportedExtensions.join('|')
-    const urlRegex = new RegExp(`https?://[^\\s,]+\\.(${extensionPattern})(?:\\?[^\\s,]*)?`, 'gi')
-    const matches = text.match(urlRegex)
-    if (matches) {
-      fileLinks.push(...matches)
-    }
+  // 方法4: 查找可能被其他字符包围的URL
+  const generalUrlRegex = /https?:\/\/[^\s<>"{}|\\^`\[\]]+/gi
+  const generalMatches = text.match(generalUrlRegex)
+  if (generalMatches) {
+    generalMatches.forEach(url => {
+      // 清理URL末尾可能的标点符号
+      const cleanUrl = url.replace(/[.,;:!?]*$/, '')
+      const urlWithoutParams = cleanUrl.split('?')[0].split('#')[0]
+      const extension = urlWithoutParams.split('.').pop().toLowerCase()
+      if (supportedExtensions.includes(extension)) {
+        fileLinks.add(cleanUrl)
+      }
+    })
   }
 
-  // 去重并返回
-  return [...new Set(fileLinks)]
+  return Array.from(fileLinks)
 }
 
 // 添加消息到列表
@@ -157,11 +210,17 @@ const processMessageWithFiles = async (content, type = 'ai-answer') => {
 
   // 移除所有检测到的文件链接
   fileLinks.forEach(link => {
-    textContent = textContent.replace(link, '').replace(/,\s*$/, '').replace(/^\s*,/, '').trim()
+    // 使用更安全的方式移除链接，避免影响其他内容
+    const escapedLink = link.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const linkRegex = new RegExp(escapedLink, 'g')
+    textContent = textContent.replace(linkRegex, '')
   })
 
-  // 清理多余的逗号和空格
-  textContent = textContent.replace(/,+/g, ',').replace(/^,|,$/g, '').trim()
+  // 清理多余的分隔符和空格
+  textContent = textContent
+    .replace(/[,\s]+/g, ' ')  // 替换多个逗号和空格为单个空格
+    .replace(/^\s*[,;|]\s*|\s*[,;|]\s*$/g, '')  // 移除开头和结尾的分隔符
+    .trim()
 
   for (const link of fileLinks) {
     const fileType = getFileType(link)
@@ -208,74 +267,34 @@ const sendMessage = (messageData) => {
   // 设置连接状态
   connectionStatus.value = 'connecting'
 
-  // 临时存储
-  let messageBuffer = []
-  let lastBubbleTime = Date.now()
+  // 🔥 移除消息缓冲逻辑，每条消息都立即创建气泡
   let isFirstResponse = true
 
-  const chineseEndPunctuation = ['。', '！', '？', '…']
-  const minBubbleInterval = 800
-
-  // 创建消息气泡的函数
+  // 创建消息气泡的函数 - 简化版本
   const createBubble = async (content, type = 'ai-answer') => {
     if (!content.trim()) return
 
-    const now = Date.now()
-    const timeSinceLastBubble = now - lastBubbleTime
-
-    const processBubble = async () => {
-      // 检查是否包含文件链接
-      await processMessageWithFiles(content, type)
-    }
-
-    if (isFirstResponse) {
-      // 第一条消息立即显示
-      await processBubble()
-      isFirstResponse = false
-    } else if (timeSinceLastBubble < minBubbleInterval) {
-      // 如果与上一气泡间隔太短，添加一个延迟
-      setTimeout(async () => {
-        await processBubble()
-      }, minBubbleInterval - timeSinceLastBubble)
-    } else {
-      // 正常添加消息
-      await processBubble()
-    }
-
-    lastBubbleTime = now
-    messageBuffer = []
+    // 检查是否包含文件链接
+    await processMessageWithFiles(content, type)
   }
 
-  // 🔥 关键修改：传递字符串 message 而不是整个 messageData 对象
+  //  关键修改：传递字符串 message 而不是整个 messageData 对象
   eventSource = chatWithManus(message)
 
-  // 监听SSE消息
+  // 监听SSE消息 - 🔥 主要修改在这里
   eventSource.onmessage = async (event) => {
     const data = event.data
 
     if (data && data !== '[DONE]') {
-      messageBuffer.push(data)
+      // 🔥 直接为每条消息创建气泡，不使用缓冲
+      await createBubble(data, isFirstResponse ? 'ai-answer' : 'ai-answer')
 
-      // 检查是否应该创建新气泡
-      const combinedText = messageBuffer.join('')
-
-      // 句子结束或消息长度达到阈值
-      const lastChar = data.charAt(data.length - 1)
-      const hasCompleteSentence = chineseEndPunctuation.includes(lastChar) || data.includes('\n\n')
-      const isLongEnough = combinedText.length > 40
-
-      if (hasCompleteSentence || isLongEnough) {
-        await createBubble(combinedText)
+      if (isFirstResponse) {
+        isFirstResponse = false
       }
     }
 
     if (data === '[DONE]') {
-      // 如果还有未显示的内容，创建最后一个气泡
-      if (messageBuffer.length > 0) {
-        const remainingContent = messageBuffer.join('')
-        await createBubble(remainingContent, 'ai-final')
-      }
-
       // 完成后关闭连接
       connectionStatus.value = 'disconnected'
       eventSource.close()
@@ -287,22 +306,30 @@ const sendMessage = (messageData) => {
     console.error('SSE Error:', error)
     connectionStatus.value = 'error'
     eventSource.close()
-
-    // 如果出错时有未显示的内容，也创建气泡
-    if (messageBuffer.length > 0) {
-      const remainingContent = messageBuffer.join('')
-      await createBubble(remainingContent, 'ai-error')
-    }
   }
 }
 
 // 返回主页
 const goBack = () => {
-  router.push('/')
+  console.log('尝试跳转到首页...')
+  router.push('/').then(() => {
+    console.log('跳转成功')
+  }).catch(err => {
+    console.error('跳转失败:', err)
+  })
 }
 
-// 页面加载时添加欢迎消息
+// 修复：合并 onMounted 钩子
 onMounted(() => {
+  // 检查用户是否登录，未登录则跳转到登录页面
+  if (!loginUserStore.loginUser?.id) {
+    router.replace('/user/login')
+    return
+  }
+
+  // 生成聊天ID
+  chatId.value = generateChatId()
+
   // 添加欢迎消息
   addMessage('你好，我是AI超级智能体。我可以解答各类问题，提供专业建议，请问有什么可以帮助你的吗？', false)
 })
