@@ -217,7 +217,7 @@ export function chatWithManus(message: string): EventSource {
 }
 
 
-// 支持文件上传 POST /api/ai/my_app/chat/sse（返回String）
+// 新增：AI恋爱大师聊天，支持文件上传 POST /api/ai/my_app/chat/sse（返回String）
 export async function chatWithExpertWithFile(
   message: string,
   chatId: string,
