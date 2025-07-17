@@ -34,6 +34,9 @@
         </a-form-item>
       </a-form>
 
+      <!-- 添加游客登录按钮 -->
+      <a-button @click="handleGuestLogin" class="guest-login-btn">游客登录</a-button>
+
       <div class="signup-prompt">
         没有账号？
         <RouterLink to="/user/register" class="signup-link">去注册</RouterLink>
@@ -59,9 +62,7 @@ const loginUserStore = useLoginUserStore()
 
 /**
  • 提交表单
-
  • @param values
-
  */
 const handleSubmit = async (values: any) => {
   const res = await userLoginUsingPost(values)
@@ -75,6 +76,34 @@ const handleSubmit = async (values: any) => {
     })
   } else {
     message.error('登录失败，' + res.data.message)
+  }
+}
+
+/**
+ • 游客登录处理
+ */
+const handleGuestLogin = async () => {
+  // 设置游客账号和密码
+  formState.userAccount = 'Visitor'
+  formState.userPassword = '123456789'
+
+  // 发送登录请求
+  const guestLoginData = {
+    userAccount: 'mangoyoo8',
+    userPassword: '12345678'
+  }
+
+  const res = await userLoginUsingPost(guestLoginData)
+  // 登录成功，把登录态保存到全局状态中
+  if (res.data.code === 0 && res.data.data) {
+    await loginUserStore.fetchLoginUser()
+    message.success('游客登录成功')
+    router.push({
+      path: '/',
+      replace: true,
+    })
+  } else {
+    message.error('游客登录失败，' + res.data.message)
   }
 }
 </script>
@@ -235,6 +264,32 @@ h1 {
 .login-btn:active {
   transform: translateY(1px);
   box-shadow: 0 2px 8px rgba(5, 160, 129, 0.3);
+}
+
+/* 游客登录按钮样式 */
+.guest-login-btn {
+  margin-top: 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 10px 0;
+  width: 80%;
+  background: #f5f5f5;
+  color: #555;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  height: auto;
+}
+
+.guest-login-btn:hover {
+  background: #ebebeb;
+  color: #333;
+  border-color: #ccc;
+}
+
+.guest-login-btn:active {
+  transform: translateY(1px);
 }
 
 .signup-prompt {

@@ -34,7 +34,7 @@
               <button class="quick-action" @click="addQuickMessage('帮我在本站寻找两张表情包')">
                 <span>💡</span> 按分类本站找图
               </button>
-              <button class="quick-action" @click="addQuickMessage('帮我在本站寻找一张淡蓝色系的图片')">
+              <button class="quick-action" @click="addQuickMessage('帮我在本站找一张和我上传的这张图片的色系类似的图片给我')">
                 <span>🎨</span> 按色系在本站找图
               </button>
               <button class="quick-action" @click="addQuickMessage('帮我在网上找一张风景壁纸')">
@@ -603,7 +603,7 @@ const isInputFocused = ref(false)
 const suggestions = ref([
   '分析这张图片的构图',
   '帮我搜一张山水壁纸图片给我',
-  '帮我在本站寻找一张淡蓝色系的图片',
+  '帮我在本站找一张和我上传的这张图片的色系一样的图片给我',
   '帮我在本站找一张壁纸'
 ])
 
@@ -3196,7 +3196,7 @@ watch(messages, () => {
 
 .file-preview:hover {
   background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
-  color: white;
+  color: black;
   transform: scale(1.05);
 }
 
@@ -3207,7 +3207,7 @@ watch(messages, () => {
 
 .file-download:hover {
   background: linear-gradient(135deg, var(--accent-emerald), #059669);
-  color: white;
+  color: black;
   transform: scale(1.05);
 }
 
