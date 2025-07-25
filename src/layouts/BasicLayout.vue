@@ -15,7 +15,13 @@
       </div>
 
       <a-layout-footer class="footer">
-        <a href="" target="_blank"> MangoYoo </a>
+        <div class="footer-content">
+          <div class="icp-info">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+              赣ICP备2025064044号
+            </a>
+          </div>
+        </div>
       </a-layout-footer>
     </a-layout>
   </div>
@@ -239,22 +245,6 @@ const shouldUseOverlay = computed(() => {
   z-index: 1;
 }
 
-#basicLayout .footer {
-  background: #fff !important; /* 改为纯白背景 */
-  opacity: 1 !important; /* 确保完全不透明 */
-  padding: 12px 24px; /* 减小内边距 */
-  height: 20px; /* 固定高度 */
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05); /* 添加顶部阴影 */
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 999; /* 确保在最顶层 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 /* 文字样式优化 */
 #basicLayout .footer a {
@@ -311,4 +301,74 @@ const shouldUseOverlay = computed(() => {
 :deep(.ant-layout-content) {
   background: transparent !important;
 }
+#basicLayout .footer {
+  background: #fff !important;
+  opacity: 1 !important;
+  padding: 16px 24px; /* 稍微增加内边距 */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  /* 移除以下固定定位相关的属性：
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  height: 20px;
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto; /* 这会让footer推到容器底部 */
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.copyright {
+  font-size: 14px;
+  color: #666;
+}
+
+.icp-info a {
+  font-size: 12px;
+  color: #999;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.icp-info a:hover {
+  color: #8ab4f8;
+  text-decoration: none;
+}
+
+/* 响应式设计 - 小屏幕时水平排列 */
+@media (max-width: 480px) {
+  .footer-content {
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .copyright {
+    font-size: 12px;
+  }
+
+  .icp-info a {
+    font-size: 11px;
+  }
+}
+
+/* 确保整个页面布局能正确工作 */
+#basicLayout .content {
+  padding: 0;
+  background: transparent;
+  margin-bottom: 0; /* 移除底部margin，因为不再需要为固定footer留空间 */
+  overflow: hidden;
+  width: 100%;
+  flex: 1; /* 让content区域占据剩余空间 */
+}
+
 </style>

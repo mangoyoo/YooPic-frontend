@@ -204,17 +204,21 @@ export function chatWithLoveAppSSEWithFile(
 
 // 为了向后兼容，保留原有的函数名
 export const chatWithLoveApp = chatWithLoveAppSSE
-// api/aiController.ts 或相关文件
+
 export function chatWithManus(message: string): EventSource {
-  // 🔥 修复：使用getApiBaseUrl()构造完整URL
   const encodedMessage = encodeURIComponent(message);
   const fullUrl = `${getApiBaseUrl()}/ai/manus/chat/see?message=${encodedMessage}`;
-                                                http://localhost:8123/api/ai/my_app/chat/sse
-  console.log('SSE URL:', fullUrl); // 应该输出：http://localhost:8123/api/ai/manus/chat/see?message=...
 
-  const eventSource = new EventSource(fullUrl);
+  console.log('SSE URL:', fullUrl);
+
+  // 添加更多配置选项
+  const eventSource = new EventSource(fullUrl, {
+    withCredentials: true // 如果需要携带 cookies
+  });
+
   return eventSource;
 }
+
 
 
 // 新增：AI恋爱大师聊天，支持文件上传 POST /api/ai/my_app/chat/sse（返回String）

@@ -51,7 +51,7 @@ const router = createRouter({
     },
     {
       path: '/yoopic_agent',
-      name: 'YooPic-智能体',
+      name: 'YooPic-AI',
       component: AgentHomePage,
     },
     {

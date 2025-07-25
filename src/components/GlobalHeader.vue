@@ -76,7 +76,8 @@ import {
   AppstoreOutlined,
   SettingOutlined,
   RobotOutlined,
-  FileImageOutlined
+  FileImageOutlined,
+  GithubOutlined
 } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -112,7 +113,7 @@ const fixedMenuItems = [
   },
   {
     key: '/yoopic_agent',
-    label: 'YooPic-智能体',
+    label: 'YooPic-AI',
     icon: () => h(RobotOutlined),
   },
 ]
@@ -162,7 +163,7 @@ const getTeamSpaceMenu = computed(() => ({
 const items = computed(() => {
   const allItems = [...fixedMenuItems]
 
-  // 添加团队空间菜单
+  // 添加团队空间菜单（如果用户已登录）
   if (loginUserStore.loginUser.id) {
     allItems.push(getTeamSpaceMenu.value)
   }
@@ -172,15 +173,16 @@ const items = computed(() => {
     allItems.push(...adminItems)
   }
 
+  // GitHub菜单项放在最后
+  allItems.push({
+    key: 'github',
+    label: 'GitHub',
+    icon: () => h(GithubOutlined),
+  })
+
   return allItems
 })
 
-// 当前要高亮的菜单项
-const current = ref<string[]>([])
-// 监听路由变化，更新高亮菜单项
-router.afterEach((to) => {
-  current.value = [to.path]
-})
 
 // 加载团队空间列表
 const fetchTeamSpaceList = async () => {
@@ -205,6 +207,11 @@ watchEffect(() => {
 
 // 路由跳转事件
 const doMenuClick = ({ key }) => {
+  // 如果是GitHub链接，直接在新窗口打开
+  if (key === 'github') {
+    window.open('https://github.com/mangoyoo', '_blank')
+    return
+  }
   router.push(key)
 }
 

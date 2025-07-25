@@ -6,10 +6,10 @@
     :footer="false"
     @cancel="closeModal"
   >
-    <!-- 图片裁切组件 -->
+    <!-- 图片裁切组件 - 使用代理 URL -->
     <vue-cropper
       ref="cropperRef"
-      :img="imageUrl"
+      :img="proxyImageUrl"
       output-type="png"
       :info="true"
       :can-move-box="true"
@@ -35,7 +35,7 @@
         <a-button @click="changeScale(1)" :disabled="!canEdit">放大</a-button>
         <a-button @click="changeScale(-1)" :disabled="!canEdit">缩小</a-button>
         <a-button type="primary" :loading="loading" :disabled="!canEdit" @click="handleConfirm"
-          >确认
+        >确认
         </a-button>
       </a-space>
     </div>
@@ -64,6 +64,18 @@ const props = defineProps<Props>()
 // 是否为团队空间
 const isTeamSpace = computed(() => {
   return props.space?.spaceType === SPACE_TYPE_ENUM.TEAM
+})
+
+// 将腾讯云 URL 转换为代理 URL，解决 CORS 问题
+const proxyImageUrl = computed(() => {
+  if (!props.imageUrl) return ''
+
+  // 将腾讯云 URL 转换为代理 URL
+  if (props.imageUrl.startsWith('https://www.yoodns.yoopic.space/')) {
+    return props.imageUrl.replace('https://www.yoodns.yoopic.space/', 'https://www.yoopic.space/images/')
+  }
+
+  return props.imageUrl
 })
 
 // 获取图片裁切器的引用

@@ -35,10 +35,10 @@
             <h3>AI 图像分析助手</h3>
             <p>我可以帮您高效整合多种来源的图片和文字素材，并且以文件的形式美观呈现出来。为您的工作流提高效率😄</p>
             <div class="quick-actions">
-              <button class="quick-action" @click="addQuickMessage('帮我获取广州的天气，再看看今天的top 3热点新闻，以html页面文件的形式返回给我')">
+              <button class="quick-action" @click="addQuickMessage('看看今天的top 3热点新闻，再帮我获取广州的天气，以html页面文件的形式返回给我')">
                 <span>📐</span> 今日新闻素材任务
               </button>
-              <button class="quick-action" @click="addQuickMessage('帮我看看深圳附近适合拍照打卡的徒步路线，帮我写一份攻略。应该包含徒步路线的图文介绍，该城市的天气信息，不仅要包含丰富的文字介绍信息，还可以根据对应的徒步路线名称可以去网上搜索相关图片，还可以适当插入一些本站的类别为表情包图片。最终把这份攻略内容整合以的htlml文件格式给我。')">
+              <button class="quick-action" @click="addQuickMessage('帮我看看广州附近适合拍照打卡的徒步路线，帮我写一份攻略。应该包含徒步路线的图文介绍，不仅要包含丰富的文字介绍信息，还可以根据对应的徒步路线名称可以去网上搜索相关图片，还有该城市的天气信息，还可以适当插入一些本站的类别为表情包图片。最终把这份攻略内容整合以的htlml文件格式给我。')">
                 <span>🎨</span> 出行规划素材任务
               </button>
             </div>
@@ -212,7 +212,7 @@
                 @input="adjustTextareaHeight"
                 @focus="onInputFocus"
                 @blur="onInputBlur"
-                placeholder="输入消息或上传图片进行分析..."
+                placeholder="你好呀，有什么可以帮助你的吗？"
                 class="message-input"
                 ref="messageInput"
                 :disabled="connectionStatus === 'connecting'"
@@ -608,11 +608,11 @@ const isInputFocused = ref(false)
 const suggestions = ref([
   {
     label: '今日新闻素材任务',
-    value: '帮我获取广州的天气，再看看今天的top 3热点新闻，以html页面文件的形式返回给我'
+    value: '看看今天的top 3热点新闻，再帮我获取广州的天气，以html页面文件的形式返回给我'
   },
   {
     label: '出行规划素材任务',
-    value: '帮我看看深圳附近适合拍照打卡的徒步路线，帮我写一份攻略。应该包含徒步路线的图文介绍，该城市的天气信息，不仅要包含丰富的文字介绍信息，还可以根据对应的徒步路线名称可以去网上搜索相关图片，还可以适当插入一些本站的类别为表情包图片。最终把这份攻略内容整合以的htlml文件格式给我。'
+    value: '帮我看看广州附近适合拍照打卡的徒步路线，帮我写一份攻略。应该包含徒步路线的图文介绍，不仅要包含丰富的文字介绍信息，还可以根据对应的徒步路线名称可以去网上搜索相关图片，还有该城市的天气信息，还可以适当插入一些本站的类别为表情包图片。最终把这份攻略内容整合以的htlml文件格式给我。 '
   },
 ])
 
@@ -900,7 +900,7 @@ const sendMessageWithFile = async (message, file = null, imageUrl = null) => {
     console.error('API调用失败:', error)
 
     // 更新AI消息为错误信息
-    // messages.value[loadingMessageIndex].content = `抱歉，AI服务暂时不可用${error.message ? '：' + error.message : ''}`
+    messages.value[loadingMessageIndex].content = `抱歉，AI服务暂时不可用${error.message ? '：' + error.message : ''}`
     // messages.value.splice(loadingIndex, 1)
     messages.value[loadingMessageIndex].type = 'ai-error'
 
@@ -955,7 +955,6 @@ const sendMessageWithImages = async (message, images = []) => {
   connectionStatus.value = 'connecting'
 
   // 添加初始加载消息
-
   addMessage('', false, null, 'ai-loading')
 
   try {
@@ -964,9 +963,66 @@ const sendMessageWithImages = async (message, images = []) => {
     // 创建SSE连接
     eventSource = chatWithManus(message)
 
-    // 监听SSE消息
+    // 监听不同类型的SSE事件
+    eventSource.addEventListener('heartbeat', (event) => {
+      // 心跳消息，不做任何处理，只是保持连接活跃
+      console.log('Received heartbeat:', event.data)
+    })
+
+    eventSource.addEventListener('start', (event) => {
+      // 智能体开始执行
+      const loadingIndex = messages.value.findIndex(msg => msg.type === 'ai-loading')
+      if (loadingIndex !== -1) {
+        messages.value.splice(loadingIndex, 1)
+      }
+      processMessageWithFiles(event.data, 'ai-answer')
+      if (connectionStatus.value === 'connecting') {
+        addMessage('', false, null, 'ai-loading')
+      }
+    })
+
+    eventSource.addEventListener('step', async (event) => {
+      // 处理步骤消息
+      const loadingIndex = messages.value.findIndex(msg => msg.type === 'ai-loading')
+      if (loadingIndex !== -1) {
+        messages.value.splice(loadingIndex, 1)
+      }
+      await processMessageWithFiles(event.data, 'ai-answer')
+      if (connectionStatus.value === 'connecting') {
+        addMessage('', false, null, 'ai-loading')
+      }
+    })
+
+    eventSource.addEventListener('finish', async (event) => {
+      // 处理完成消息
+      const loadingIndex = messages.value.findIndex(msg => msg.type === 'ai-loading')
+      if (loadingIndex !== -1) {
+        messages.value.splice(loadingIndex, 1)
+      }
+      await processMessageWithFiles(event.data, 'ai-answer')
+      connectionStatus.value = 'disconnected'
+      eventSource.close()
+    })
+
+    eventSource.addEventListener('error', async (event) => {
+      // 处理错误消息
+      const loadingIndex = messages.value.findIndex(msg => msg.type === 'ai-loading')
+      if (loadingIndex !== -1) {
+        messages.value.splice(loadingIndex, 1)
+      }
+      await processMessageWithFiles(event.data, 'ai-error')
+      connectionStatus.value = 'error'
+      eventSource.close()
+    })
+
+    // 通用消息处理（兼容原有格式）
     eventSource.onmessage = async (event) => {
       const data = event.data
+
+      // 过滤心跳消息
+      if (data === 'ping') {
+        return // 忽略心跳消息
+      }
 
       if (data && data !== '[DONE]') {
         // 找到并移除当前的加载消息
@@ -979,10 +1035,9 @@ const sendMessageWithImages = async (message, images = []) => {
         await processMessageWithFiles(data, 'ai-answer')
 
         // 添加新的加载消息，为下一条消息做准备
-        if(connectionStatus.value == 'connecting'){
+        if (connectionStatus.value === 'connecting') {
           addMessage('', false, null, 'ai-loading')
         }
-
       }
 
       if (data === '[DONE]') {
@@ -1001,13 +1056,11 @@ const sendMessageWithImages = async (message, images = []) => {
       console.error('SSE Error:', error)
       connectionStatus.value = 'error'
 
-      // 移除加载消息并显示错误
+      // 移除加载消息
       const loadingIndex = messages.value.findIndex(msg => msg.type === 'ai-loading')
       if (loadingIndex !== -1) {
         messages.value.splice(loadingIndex, 1)
       }
-      // addMessage('抱歉，AI服务暂时不可用2', false, null, 'ai-error')
-      // messages.value.splice(loadingIndex, 1)
       connectionStatus.value = 'error'
       eventSource.close()
     }
@@ -1015,18 +1068,16 @@ const sendMessageWithImages = async (message, images = []) => {
   } catch (error) {
     console.error('API调用失败:', error)
 
-    // 移除加载消息并显示错误
+    // 移除加载消息
     const loadingIndex = messages.value.findIndex(msg => msg.type === 'ai-loading')
     if (loadingIndex !== -1) {
       messages.value.splice(loadingIndex, 1)
     }
-    // addMessage(`抱歉，AI服务暂时不可用1：${error.message || error}`, false, null, 'ai-error')
-    // messages.value.splice(loadingIndex, 1)
     eventSource.close()
     connectionStatus.value = 'error'
-
   }
 }
+
 
 
 

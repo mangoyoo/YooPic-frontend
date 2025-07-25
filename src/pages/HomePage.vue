@@ -64,9 +64,17 @@
             <div class="card-wrapper">
               <div class="waterfall-item">
                 <div class="image-wrapper" :style="item.picHeight && item.picWidth
-                  ? { paddingTop: (item.picHeight / item.picWidth) * 100 + '%' }
-                  : {}">
-                  <img :src="item.url" :alt="item.title" @load="onImageLoad" @click="doClickPicture(item)" />
+  ? { paddingTop: (item.picHeight / item.picWidth) * 100 + '%' }
+  : {}">
+                  <img
+                    :src="item.url"
+                    :alt="item.title"
+                    :loading="getImageLoadingStrategy(item)"
+                    :fetchpriority="getImagePriority(item)"
+                    @load="onImageLoad"
+                    @click="doClickPicture(item)"
+                  />
+
                   <div class="waterfall-actions">
                     <a-tooltip title="分享">
                       <ShareAltOutlined @click="(e) => doShare(item, e)" />
@@ -148,6 +156,19 @@ const searchParams = reactive<API.PictureQueryRequest>({
   sortOrder: 'descend',
   searchText: '',
 })
+// 获取图片优先级
+const getImagePriority = (item: API.PictureVO) => {
+  const index = dataList.value.findIndex(pic => pic.id === item.id)
+  // 前4张图片高优先级
+  return index < 20 ? 'high' : 'auto'
+}
+
+// 获取图片加载策略
+const getImageLoadingStrategy = (item: API.PictureVO) => {
+  const index = dataList.value.findIndex(pic => pic.id === item.id)
+  // 前8张图片立即加载，其余延迟加载
+  return index < 20 ? 'eager' : 'lazy'
+}
 
 // 瀑布流断点配置
 const breakpoints = computed(() => {
@@ -220,11 +241,14 @@ const fetchData = async (loadMore = false) => {
     const res = await listPictureVoByPageUsingPost(params)
     if (res.data.code === 0 && res.data.data) {
       const newData = res.data.data.records ?? []
-
       if (loadMore) {
         dataList.value = [...dataList.value, ...newData]
       } else {
         dataList.value = newData
+        // 预加载前6张图片
+        nextTick(() => {
+          preloadPriorityImages()
+        })
       }
 
       total.value = res.data.data.total ?? 0
@@ -244,7 +268,17 @@ const fetchData = async (loadMore = false) => {
     loading.value = false
   }
 }
-
+// 预加载优先图片的方法
+const preloadPriorityImages = () => {
+  const priorityCount = Math.min(12, dataList.value.length)
+  for (let i = 0; i < priorityCount; i++) {
+    const item = dataList.value[i]
+    if (item.url) {
+      const img = new Image()
+      img.src = item.url
+    }
+  }
+}
 // 重置并搜索
 const resetAndSearch = () => {
   searchParams.current = 1

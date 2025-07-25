@@ -2,7 +2,7 @@
   <div class="yoopic-login-bg">
     <div class="login-card">
       <h1>YooPic</h1>
-      <div class="desc">智能协同AI云图库</div>
+      <div class="desc">云端智能体图片素材库</div>
 
       <a-form :model="formState" name="basic" autocomplete="off" @finish="handleSubmit" class="login-form">
         <a-form-item name="userAccount" :rules="[{ required: true, message: '请输入账号' }]">
@@ -89,8 +89,8 @@ const handleGuestLogin = async () => {
 
   // 发送登录请求
   const guestLoginData = {
-    userAccount: 'mangoyoo8',
-    userPassword: '12345678'
+    userAccount: 'Visitor',
+    userPassword: '123456789'
   }
 
   const res = await userLoginUsingPost(guestLoginData)

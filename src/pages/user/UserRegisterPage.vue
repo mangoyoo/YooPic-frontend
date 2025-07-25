@@ -2,7 +2,7 @@
   <div class="yoopic-register-bg">
     <div class="register-card">
       <h1>YooPic</h1>
-      <div class="desc">智能协同AI云图库</div>
+      <div class="desc">云端智能体图片素材库</div>
 
       <a-form :model="formState" name="basic" autocomplete="off" @finish="handleSubmit" class="register-form">
         <a-form-item name="userAccount" :rules="[{ required: true, message: '请输入账号' }]">
